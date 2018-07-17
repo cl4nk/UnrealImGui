@@ -67,9 +67,6 @@ FImGuiContextProxy::FImGuiContextProxy(const FString& InName, FSimpleMulticastDe
 	IO.DisplaySize = { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT };
 	DisplaySize = ImGuiInterops::ToVector2D(IO.DisplaySize);
 
-	IO.DisplayFramebufferScale = { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT };
-	BufferScale = ImGuiInterops::ToVector2D(IO.DisplayFramebufferScale);
-
 	// Initialize key mapping, so context can correctly interpret input state.
 	ImGuiInterops::SetUnrealKeyMap(IO);
 
@@ -101,20 +98,6 @@ void FImGuiContextProxy::SetDisplaySize(const FVector2D & Size)
 
 	IO.DisplaySize = { Size.X, Size.Y };
 	DisplaySize = Size;
-
-	ImGui::SetCurrentContext(OldContext);
-}
-
-void FImGuiContextProxy::SetBufferScale(const FVector2D & Scale)
-{
-	ImGuiContext * OldContext = ImGui::GetCurrentContext();
-
-	SetAsCurrent();
-
-	ImGuiIO& IO = ImGui::GetIO();
-
-	IO.DisplayFramebufferScale = { Scale.X , Scale.Y };
-	BufferScale = ImGuiInterops::ToVector2D(IO.DisplayFramebufferScale);
 
 	ImGui::SetCurrentContext(OldContext);
 }

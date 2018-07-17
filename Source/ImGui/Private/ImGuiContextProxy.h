@@ -54,10 +54,6 @@ public:
 
 	void SetDisplaySize(const FVector2D& Size);
 
-	const FVector2D& GetBufferScale() const { return BufferScale; }
-
-	void SetBufferScale(const FVector2D& Scale);
-
 	// Whether this context has an active item (read once per frame during context update and cached here for easy access).
 	bool HasActiveItem() const { return bHasActiveItem; }
 
@@ -84,7 +80,6 @@ private:
 	TUniquePtr<ImGuiContext> Context;
 
 	FVector2D DisplaySize = FVector2D::ZeroVector;
-	FVector2D BufferScale = FVector2D::ZeroVector;
 
 	EMouseCursor::Type MouseCursor = EMouseCursor::None;
 	bool bHasActiveItem = false;

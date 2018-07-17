@@ -23,10 +23,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
 	bool IsFocusable;
 
-	/** Sometimes a button should only be mouse-clickable and never keyboard focusable. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Display")
-	FVector2D BufferScale = { 1.0f, 1.0f };
-
 	UFUNCTION(BlueprintCallable)
 	void SetAsCurrent() const;
 

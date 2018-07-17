@@ -73,7 +73,7 @@ void SImGuiWidget::Construct(const FArguments& InArgs)
 	bIsFocusable = InArgs._IsFocusable;
 
 	// Disable mouse cursor over this widget as we will use ImGui to draw it.
-	SetCursor(EMouseCursor::None);
+	//SetCursor(EMouseCursor::None);
 
 	// Bind this widget to its context proxy.
 	auto* ContextProxy = GetContextProxy();
@@ -81,8 +81,6 @@ void SImGuiWidget::Construct(const FArguments& InArgs)
 	checkf(ContextProxy, TEXT("Missing context during widget construction: ContextIndex = %d"), ContextIndex);
 	ContextProxy->OnDraw().AddRaw(this, &SImGuiWidget::OnDebugDraw);
 	ContextProxy->SetInputState(&InputState);
-
-	ContextProxy->SetBufferScale(InArgs._Scale);
 
 	// Create ImGui Input Handler.
 	CreateInputHandler();
@@ -254,7 +252,7 @@ FReply SImGuiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEve
 
 FReply SImGuiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	InputState.SetMousePosition(MouseEvent.GetScreenSpacePosition());
+	InputState.SetMousePosition(MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition()));
 	CopyModifierKeys(MouseEvent);
 
 	// This event is called in every frame when we have a mouse, so we can use it to raise notifications.
@@ -703,7 +701,6 @@ void SImGuiWidget::OnDebugDraw()
 			{
 				FImGuiContextProxy* ContextProxy = GetContextProxy();
 				TwoColumns::Value("Display Size", ContextProxy ? *ContextProxy->GetDisplaySize().ToString() : TEXT("< Null >"));
-				TwoColumns::Value("Buffer Scale", ContextProxy ? *ContextProxy->GetBufferScale().ToString() : TEXT("< Null >"));
 			});
 		}
 		ImGui::End();

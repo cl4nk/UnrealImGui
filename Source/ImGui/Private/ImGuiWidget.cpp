@@ -39,8 +39,7 @@ TSharedRef<SWidget> UImGuiWidget::RebuildWidget()
 		MyImGuiWidget = SNew(SImGuiWidget).
 			ModuleManager(ImGuiModuleManager).
 			ContextIndex(ContextIndex).
-			IsFocusable(IsFocusable).
-			Scale(BufferScale);
+			IsFocusable(IsFocusable);
 	}
 	
 	return MyImGuiWidget.ToSharedRef();

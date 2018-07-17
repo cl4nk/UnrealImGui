@@ -8,6 +8,7 @@
 
 
 class FImGuiModuleManager;
+class FImGuiContextProxy;
 class UImGuiInputHandler;
 
 // Slate widget for rendering ImGui output and storing Slate inputs.
@@ -21,13 +22,11 @@ public:
 		: _ModuleManager(nullptr)
 		, _ContextIndex (0)
 		, _IsFocusable(true)
-		, _Scale (1.0f, 1.0f)
 	{} 
 
 		SLATE_ARGUMENT(FImGuiModuleManager*, ModuleManager)
 		SLATE_ARGUMENT(int32, ContextIndex)
 		SLATE_ARGUMENT(bool, IsFocusable)
-		SLATE_ARGUMENT(FVector2D, Scale)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
