@@ -126,7 +126,7 @@ void FImGuiModuleManager::Tick(float DeltaSeconds)
 	}
 }
 
-TSharedPtr<SImGuiWidget> FImGuiModuleManager::Create(UWorld * World)
+int32 FImGuiModuleManager::GetContextIndex(UWorld * World)
 {
 	// Create and initialize the widget.
 
@@ -139,8 +139,5 @@ TSharedPtr<SImGuiWidget> FImGuiModuleManager::Create(UWorld * World)
 	// Make sure that textures are loaded before the first Slate widget is created.
 	LoadTextures();
 
-	TSharedPtr<SImGuiWidget> SharedWidget;
-	SAssignNew(SharedWidget, SImGuiWidget).ModuleManager(this).ContextIndex(ContextIndex);
-
-	return SharedWidget;
+	return ContextIndex;
 }

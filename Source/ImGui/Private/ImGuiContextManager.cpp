@@ -150,14 +150,14 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(co
 	using namespace Utilities;
 
 #if WITH_EDITOR
-	if (World && World->WorldType == EWorldType::Editor)
+	if (World == nullptr || World->WorldType == EWorldType::Editor || World->WorldType == EWorldType::EditorPreview)
+	{
 		if (OutIndex)
 		{
 			*OutIndex = Utilities::EDITOR_CONTEXT_INDEX;
 		}
 
 		return GetEditorContextData();
-	{
 	}
 #endif
 

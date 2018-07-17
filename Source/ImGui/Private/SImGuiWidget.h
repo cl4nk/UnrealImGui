@@ -18,9 +18,16 @@ class SImGuiWidget : public SLeafWidget
 public:
 
 	SLATE_BEGIN_ARGS(SImGuiWidget)
-	{}
-	SLATE_ARGUMENT(FImGuiModuleManager*, ModuleManager)
-	SLATE_ARGUMENT(int32, ContextIndex)
+		: _ModuleManager(nullptr)
+		, _ContextIndex (0)
+		, _IsFocusable(true)
+		, _Scale (1.0f, 1.0f)
+	{} 
+
+		SLATE_ARGUMENT(FImGuiModuleManager*, ModuleManager)
+		SLATE_ARGUMENT(int32, ContextIndex)
+		SLATE_ARGUMENT(bool, IsFocusable)
+		SLATE_ARGUMENT(FVector2D, Scale)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
@@ -37,9 +44,7 @@ public:
 	// SWidget overrides
 	//----------------------------------------------------------------------------------------------------
 
-	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
-
-	virtual bool SupportsKeyboardFocus() const override { return bInputEnabled; }
+	virtual bool SupportsKeyboardFocus() const override;
 
 	virtual FReply OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent) override;
 
@@ -69,16 +74,9 @@ public:
 
 	virtual FCursorReply OnCursorQuery(const FGeometry& MyGeometry, const FPointerEvent& CursorEvent) const override;
 
-private:
+	virtual bool IsInteractable() const override;
 
-	enum class EInputMode : uint8
-	{
-		None,
-		// Mouse pointer only without user focus
-		MousePointerOnly,
-		// Full input with user focus (mouse, keyboard and depending on navigation mode gamepad)
-		Full
-	};
+private:
 
 	void CreateInputHandler();
 	void ReleaseInputHandler();
@@ -92,22 +90,9 @@ private:
 
 	void SetMouseCursorOverride(EMouseCursor::Type InMouseCursorOverride);
 
-	// Update visibility based on input enabled state.
-	void SetVisibilityFromInputEnabled();
-
-	// Update input enabled state from console variable.
-	void UpdateInputEnabled();
-
-	// Determine new input mode based on hints.
-	void UpdateInputMode(bool bHasKeyboardFocus, bool bHasMousePointer);
-
-	void UpdateMouseStatus();
-
 	FORCEINLINE bool HasMouseEventNotification() const { return bReceivedMouseEvent; }
 	FORCEINLINE void NotifyMouseEvent() { bReceivedMouseEvent = true; }
 	FORCEINLINE void ClearMouseEventNotification() { bReceivedMouseEvent = false; }
-
-	void OnPostImGuiUpdate();
 
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
 
@@ -125,8 +110,7 @@ private:
 
 	FImGuiInputState InputState;
 
-	EInputMode InputMode = EInputMode::None;
-	bool bInputEnabled = false;
+	bool bIsFocusable = false;
 	bool bReceivedMouseEvent = false;
 	bool bMouseLock = false;
 

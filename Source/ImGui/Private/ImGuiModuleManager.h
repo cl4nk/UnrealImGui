@@ -24,7 +24,7 @@ public:
 	// Event called right after ImGui is updated, to give other subsystems chance to react.
 	FSimpleMulticastDelegate& OnPostImGuiUpdate() { return PostImGuiUpdateEvent; }
 
-	TSharedPtr<SImGuiWidget> Create(UWorld * World);
+	int32 GetContextIndex(UWorld * World);
 
 private:
 

@@ -13,8 +13,8 @@ void UImGuiWidget::ReleaseSlateResources(bool bReleaseChildren)
 	Super::ReleaseSlateResources(bReleaseChildren);
 
 	MyImGuiWidget.Reset();
-
 }
+
 TSharedRef<SWidget> UImGuiWidget::RebuildWidget()
 {
 	if (FImGuiModule::IsAvailable())
@@ -23,15 +23,17 @@ TSharedRef<SWidget> UImGuiWidget::RebuildWidget()
 
 		FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
 
-		if (ImGuiModuleManager)
-		{
-			MyImGuiWidget = ImGuiModuleManager->Create(GetWorld());
-		}
+		int32 ContextIndex = ImGuiModuleManager ? ImGuiModuleManager->GetContextIndex(GetWorld()) : 0;
+
+		MyImGuiWidget = SNew(SImGuiWidget).
+			ModuleManager(ImGuiModuleManager).
+			ContextIndex(ContextIndex).
+			IsFocusable(IsFocusable).
+			Scale(BufferScale);
 	}
 	
 	return MyImGuiWidget.ToSharedRef();
 }
-
 
 #if WITH_EDITOR
 

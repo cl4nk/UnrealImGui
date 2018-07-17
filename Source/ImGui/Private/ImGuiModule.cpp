@@ -123,22 +123,6 @@ void FImGuiModule::ShutdownModule()
 	ImGuiModuleManager = nullptr;
 }
 
-bool FImGuiModule::IsInputMode() const
-{
-	return false;
-}
-
-void FImGuiModule::SetInputMode(bool bEnabled)
-{
-	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	//CVars::InputEnabled->Set(bEnabled ? 1 : 0, ECVF_SetByConsole);
-}
-
-void FImGuiModule::ToggleInputMode()
-{
-	SetInputMode(!IsInputMode());
-}
-
 bool FImGuiModule::IsShowingDemo() const
 {
 	return CVars::ShowDemo.GetValueOnAnyThread() > 0;
