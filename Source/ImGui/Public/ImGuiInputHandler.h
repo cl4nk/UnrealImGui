@@ -181,13 +181,11 @@ protected:
 
 private:
 
-	void Initialize(FImGuiModuleManager* InModuleManager, UGameViewportClient* InGameViewport, int32 InContextIndex);
+	void Initialize(FImGuiModuleManager* InModuleManager, int32 InContextIndex);
 
 	FORCEINLINE FImGuiInputResponse DefaultResponse() { return FImGuiInputResponse{ true, true }; }
 
 	FImGuiModuleManager* ModuleManager = nullptr;
-
-	TWeakObjectPtr<UGameViewportClient> GameViewport;
 
 	int32 ContextIndex = -1;
 

@@ -37,22 +37,26 @@ namespace
 	}
 
 	// Name for world ImGui context.
-	FORCEINLINE FString GetWorldContextName(const UWorld& World)
+	FORCEINLINE FString GetWorldContextName(const UWorld* World)
 	{
 		using namespace Utilities;
 
 		const FWorldContext* WorldContext = GetWorldContext(World);
-		switch (WorldContext->WorldType)
+		if (WorldContext)
 		{
-		case EWorldType::PIE:
-			return FString::Printf(TEXT("PIEContext%d"), GetWorldContextIndex(*WorldContext));
-		case EWorldType::Game:
-			return TEXT("Game");
-		case EWorldType::Editor:
-			return TEXT("Editor");
-		default:
-			return TEXT("Other");
+			switch (WorldContext->WorldType)
+			{
+			case EWorldType::PIE:
+				return FString::Printf(TEXT("PIEContext%d"), GetWorldContextIndex(*WorldContext));
+			case EWorldType::Game:
+				return TEXT("Game");
+			case EWorldType::Editor:
+				return TEXT("Editor");
+			default:
+				return TEXT("Other");
+			}
 		}
+		return TEXT("Null");
 	}
 
 #else
@@ -104,7 +108,7 @@ void FImGuiContextManager::OnWorldTickStart(ELevelTick TickType, float DeltaSeco
 {
 	if (GWorld)
 	{
-		FImGuiContextProxy& ContextProxy = GetWorldContextProxy(*GWorld);
+		FImGuiContextProxy& ContextProxy = GetWorldContextProxy(GWorld);
 		ContextProxy.SetAsCurrent();
 		if (CVars::DebugDrawOnWorldTick.GetValueOnGameThread() > 0)
 		{
@@ -141,34 +145,37 @@ FImGuiContextManager::FContextData& FImGuiContextManager::GetStandaloneWorldCont
 }
 #endif // !WITH_EDITOR
 
-FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(const UWorld& World, int32* OutIndex)
+FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(const UWorld* World, int32* OutIndex)
 {
 	using namespace Utilities;
 
 #if WITH_EDITOR
-	if (World.WorldType == EWorldType::Editor)
-	{
+	if (World && World->WorldType == EWorldType::Editor)
 		if (OutIndex)
 		{
 			*OutIndex = Utilities::EDITOR_CONTEXT_INDEX;
 		}
 
 		return GetEditorContextData();
+	{
 	}
 #endif
 
 	const FWorldContext* WorldContext = GetWorldContext(World);
-	const int32 Index = GetWorldContextIndex(*WorldContext);
+	const int32 Index = WorldContext ? GetWorldContextIndex(*WorldContext) : 0;
 
-	checkf(Index != Utilities::INVALID_CONTEXT_INDEX, TEXT("Couldn't find context index for world %s: WorldType = %d"),
-		*World.GetName(), static_cast<int32>(World.WorldType));
+	if (World)
+	{
+		checkf(Index != Utilities::INVALID_CONTEXT_INDEX, TEXT("Couldn't find context index for world %s: WorldType = %d"),
+			*World->GetName(), static_cast<int32>(World->WorldType));
 
 #if WITH_EDITOR
-	checkf(!GEngine->IsEditor() || Index != Utilities::EDITOR_CONTEXT_INDEX,
-		TEXT("Context index %d is reserved for editor and cannot be used for world %s: WorldType = %d, NetMode = %d"),
-		Index, *World.GetName(), static_cast<int32>(World.WorldType), static_cast<int32>(World.GetNetMode()));
+		checkf(!GEngine->IsEditor() || Index != Utilities::EDITOR_CONTEXT_INDEX,
+			TEXT("Context index %d is reserved for editor and cannot be used for world %s: WorldType = %d, NetMode = %d"),
+			Index, *World->GetName(), static_cast<int32>(World->WorldType), static_cast<int32>(World->GetNetMode()));
 #endif
 
+	}
 	FContextData* Data = Contexts.Find(Index);
 
 #if WITH_EDITOR

@@ -24,6 +24,8 @@ public:
 	// Event called right after ImGui is updated, to give other subsystems chance to react.
 	FSimpleMulticastDelegate& OnPostImGuiUpdate() { return PostImGuiUpdateEvent; }
 
+	TSharedPtr<SImGuiWidget> Create(UWorld * World);
+
 private:
 
 	FImGuiModuleManager();
@@ -48,11 +50,6 @@ private:
 
 	void Tick(float DeltaSeconds);
 
-	void OnViewportCreated();
-
-	void AddWidgetToViewport(UGameViewportClient* GameViewport);
-	void AddWidgetsToActiveViewports();
-
 	// Event that we call after ImGui is updated.
 	FSimpleMulticastDelegate PostImGuiUpdateEvent;
 
@@ -62,12 +59,8 @@ private:
 	// Manager for textures resources.
 	FTextureManager TextureManager;
 
-	// Slate widgets that we created.
-	TArray<TWeakPtr<SImGuiWidget>> Widgets;
-
 	FDelegateHandle TickInitializerHandle;
 	FDelegateHandle TickDelegateHandle;
-	FDelegateHandle ViewportCreatedHandle;
 
 	bool bTexturesLoaded = false;
 };

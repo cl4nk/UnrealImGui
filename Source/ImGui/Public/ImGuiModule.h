@@ -6,6 +6,7 @@
 
 #include <ModuleManager.h>
 
+class FImGuiModuleManager;
 
 class FImGuiModule : public IModuleInterface
 {
@@ -110,4 +111,11 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+protected:
+	FImGuiModuleManager* ImGuiModuleManager = nullptr;
+
+public:
+	FORCEINLINE FImGuiModuleManager* GetImGuiModuleManager() const { return ImGuiModuleManager; }
+
 };
