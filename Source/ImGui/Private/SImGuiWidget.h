@@ -34,6 +34,8 @@ public:
 
 	~SImGuiWidget();
 
+	FImGuiContextProxy* GetContextProxy() const;
+
 	// Get index of the context that this widget is targeting.
 	int32 GetContextIndex() const { return ContextIndex; }
 

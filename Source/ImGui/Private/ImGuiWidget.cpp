@@ -8,6 +8,17 @@
 
 #define LOCTEXT_NAMESPACE "UMG"
 
+void UImGuiWidget::SetAsCurrent() const
+{
+	if (MyImGuiWidget.IsValid())
+	{
+		if (FImGuiContextProxy * ContextProxy = MyImGuiWidget->GetContextProxy())
+		{
+			ContextProxy->SetAsCurrent();
+		}
+	}
+}
+
 void UImGuiWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);

@@ -76,7 +76,8 @@ void SImGuiWidget::Construct(const FArguments& InArgs)
 	SetCursor(EMouseCursor::None);
 
 	// Bind this widget to its context proxy.
-	auto* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex);
+	auto* ContextProxy = GetContextProxy();
+
 	checkf(ContextProxy, TEXT("Missing context during widget construction: ContextIndex = %d"), ContextIndex);
 	ContextProxy->OnDraw().AddRaw(this, &SImGuiWidget::OnDebugDraw);
 	ContextProxy->SetInputState(&InputState);
@@ -96,7 +97,7 @@ SImGuiWidget::~SImGuiWidget()
 	ReleaseInputHandler();
 
 	// Remove binding between this widget and its context proxy.
-	if (auto* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex))
+	if (auto* ContextProxy = GetContextProxy())
 	{
 		ContextProxy->OnDraw().RemoveAll(this);
 		ContextProxy->RemoveInputState(&InputState);
@@ -104,6 +105,16 @@ SImGuiWidget::~SImGuiWidget()
 
 	// Unregister from post-update notifications.
 	ModuleManager->OnPostImGuiUpdate().RemoveAll(this);
+}
+
+FImGuiContextProxy * SImGuiWidget::GetContextProxy() const
+{
+	if (ModuleManager)
+	{
+		FImGuiContextManager& ContextManager = ModuleManager->GetContextManager();
+		return ContextManager.GetContextProxy(ContextIndex);
+	}
+	return nullptr;
 }
 
 bool SImGuiWidget::SupportsKeyboardFocus() const
@@ -300,7 +311,7 @@ FCursorReply SImGuiWidget::OnCursorQuery(const FGeometry& MyGeometry, const FPoi
 	}
 	else if (CVars::DrawMouseCursor.GetValueOnGameThread() <= 0)
 	{
-		if (FImGuiContextProxy* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex))
+		if (FImGuiContextProxy* ContextProxy = GetContextProxy())
 		{
 			MouseCursor = ContextProxy->GetMouseCursor();
 		}
@@ -457,7 +468,7 @@ namespace
 int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect,
 	FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const
 {
-	if (FImGuiContextProxy* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex))
+	if (FImGuiContextProxy* ContextProxy = GetContextProxy())
 	{
 		ContextProxy->SetDisplaySize(AllottedGeometry.GetAbsoluteSize());
 
@@ -671,7 +682,7 @@ void SImGuiWidget::OnDebugDraw()
 			TwoColumns::CollapsingGroup("Context", [&]()
 			{
 				TwoColumns::Value("Context Index", ContextIndex);
-				FImGuiContextProxy* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex);
+				FImGuiContextProxy* ContextProxy = GetContextProxy();
 				TwoColumns::Value("Context Name", ContextProxy ? *ContextProxy->GetName() : TEXT("< Null >"));
 			});
 
@@ -690,7 +701,7 @@ void SImGuiWidget::OnDebugDraw()
 
 			TwoColumns::CollapsingGroup("Img", [&]()
 			{
-				FImGuiContextProxy* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex);
+				FImGuiContextProxy* ContextProxy = GetContextProxy();
 				TwoColumns::Value("Display Size", ContextProxy ? *ContextProxy->GetDisplaySize().ToString() : TEXT("< Null >"));
 				TwoColumns::Value("Buffer Scale", ContextProxy ? *ContextProxy->GetBufferScale().ToString() : TEXT("< Null >"));
 			});

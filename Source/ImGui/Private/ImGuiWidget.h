@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Display")
 	FVector2D BufferScale = { 1.0f, 1.0f };
 
+	UFUNCTION(BlueprintCallable)
+	void SetAsCurrent() const;
+
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 
 #if WITH_EDITOR
