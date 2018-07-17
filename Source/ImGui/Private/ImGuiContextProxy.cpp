@@ -13,6 +13,8 @@
 static constexpr float DEFAULT_CANVAS_WIDTH = 3840.f;
 static constexpr float DEFAULT_CANVAS_HEIGHT = 2160.f;
 
+static constexpr float DEFAULT_CANVAS_WIDTH_SCALE = 1.f;
+static constexpr float DEFAULT_CANVAS_HEIGHT_SCALE = 1.f;
 
 namespace CVars
 {
@@ -65,6 +67,8 @@ FImGuiContextProxy::FImGuiContextProxy(const FString& InName, FSimpleMulticastDe
 	IO.DisplaySize = { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT };
 	DisplaySize = ImGuiInterops::ToVector2D(IO.DisplaySize);
 
+	IO.DisplayFramebufferScale = { DEFAULT_CANVAS_WIDTH_SCALE, DEFAULT_CANVAS_HEIGHT_SCALE };
+
 	// Initialize key mapping, so context can correctly interpret input state.
 	ImGuiInterops::SetUnrealKeyMap(IO);
 
@@ -84,6 +88,20 @@ FImGuiContextProxy::~FImGuiContextProxy()
 		// Save context data and destroy.
 		ImGui::DestroyContext(Context.Release());
 	}
+}
+
+void FImGuiContextProxy::SetDisplaySize(const FVector2D & Size)
+{
+	ImGuiContext * OldContext = ImGui::GetCurrentContext();
+
+	SetAsCurrent();
+
+	ImGuiIO& IO = ImGui::GetIO();
+
+	IO.DisplaySize = { Size.X, Size.Y };
+	DisplaySize = Size;
+
+	ImGui::SetCurrentContext(OldContext);
 }
 
 void FImGuiContextProxy::Draw()

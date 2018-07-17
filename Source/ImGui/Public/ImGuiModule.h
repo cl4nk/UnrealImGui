@@ -6,6 +6,7 @@
 
 #include <ModuleManager.h>
 
+class FImGuiModuleManager;
 
 class FImGuiModule : public IModuleInterface
 {
@@ -69,24 +70,6 @@ public:
 	 */
 	virtual void RemoveImGuiDelegate(const FImGuiDelegateHandle& Handle);
 
-	/**
-	 * Check whether Input Mode is enabled (tests ImGui.InputEnabled console variable).
-	 *
-	 * @returns True, if Input Mode is enabled (ImGui.InputEnabled != 0) and false otherwise.
-	 */
-	virtual bool IsInputMode() const;
-
-	/**
-	 * Set Input Mode state (sets ImGui.InputEnabled console variable, so it can be used together with a console).
-	 *
-	 * @param bEnabled - Whether Input Mode should be enabled (ImGui.InputEnabled = 1) or not (ImGui.InputEnabled = 0).
-	 */
-	virtual void SetInputMode(bool bEnabled);
-
-	/**
-	 * Toggle Input Mode state (changes ImGui.InputEnabled console variable).
-	 */
-	virtual void ToggleInputMode();
 
 	/**
 	 * Check whether ImGui Demo is shown (tests ImGui.ShowDemo console variable).
@@ -110,4 +93,11 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+protected:
+	FImGuiModuleManager* ImGuiModuleManager = nullptr;
+
+public:
+	FORCEINLINE FImGuiModuleManager* GetImGuiModuleManager() const { return ImGuiModuleManager; }
+
 };

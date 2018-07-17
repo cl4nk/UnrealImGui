@@ -34,8 +34,6 @@ struct EDelegateCategory
 	};
 };
 
-static FImGuiModuleManager* ImGuiModuleManager = nullptr;
-
 #if WITH_EDITOR
 static FImGuiEditor* ImGuiEditor = nullptr;
 #endif
@@ -66,7 +64,7 @@ FImGuiDelegateHandle FImGuiModule::AddWorldImGuiDelegate(const FImGuiDelegate& D
 	checkf(WorldContext, TEXT("Couldn't find current world. AddWorldImGuiDelegate should be only called from a valid world."));
 
 	int32 Index;
-	FImGuiContextProxy& Proxy = ImGuiModuleManager->GetContextManager().GetWorldContextProxy(*WorldContext->World(), Index);
+	FImGuiContextProxy& Proxy = ImGuiModuleManager->GetContextManager().GetWorldContextProxy(WorldContext->World(), Index);
 #else
 	const int32 Index = Utilities::STANDALONE_GAME_CONTEXT_INDEX;
 	FImGuiContextProxy& Proxy = ImGuiModuleManager->GetContextManager().GetWorldContextProxy();
@@ -123,22 +121,6 @@ void FImGuiModule::ShutdownModule()
 	checkf(ImGuiModuleManager, TEXT("Null ImGui Module Manager. Module manager instance should be deleted during module shutdown."));
 	delete ImGuiModuleManager;
 	ImGuiModuleManager = nullptr;
-}
-
-bool FImGuiModule::IsInputMode() const
-{
-	return CVars::InputEnabled.GetValueOnAnyThread() > 0;
-}
-
-void FImGuiModule::SetInputMode(bool bEnabled)
-{
-	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	CVars::InputEnabled->Set(bEnabled ? 1 : 0, ECVF_SetByConsole);
-}
-
-void FImGuiModule::ToggleInputMode()
-{
-	SetInputMode(!IsInputMode());
 }
 
 bool FImGuiModule::IsShowingDemo() const

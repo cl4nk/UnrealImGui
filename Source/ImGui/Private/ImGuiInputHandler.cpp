@@ -74,10 +74,9 @@ bool UImGuiInputHandler::HasImGuiActiveItem() const
 	return ContextProxy && ContextProxy->HasActiveItem();
 }
 
-void UImGuiInputHandler::Initialize(FImGuiModuleManager* InModuleManager, UGameViewportClient* InGameViewport, int32 InContextIndex)
+void UImGuiInputHandler::Initialize(FImGuiModuleManager* InModuleManager, int32 InContextIndex)
 {
 	ModuleManager = InModuleManager;
-	GameViewport = InGameViewport;
 	ContextIndex = InContextIndex;
 
 #if WITH_EDITOR

@@ -3,14 +3,13 @@
 #pragma once
 
 class FImGuiModuleManager;
-class UGameViewportClient;
 class UImGuiInputHandler;
 
 class FImGuiInputHandlerFactory
 {
 public:
 
-	static UImGuiInputHandler* NewHandler(FImGuiModuleManager* ModuleManager, UGameViewportClient* GameViewport, int32 ContextIndex);
+	static UImGuiInputHandler* NewHandler(FImGuiModuleManager* ModuleManager, int32 ContextIndex);
 
 	static void ReleaseHandler(UImGuiInputHandler* Handler);
 };
