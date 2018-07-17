@@ -252,7 +252,7 @@ FReply SImGuiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEve
 
 FReply SImGuiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	InputState.SetMousePosition((MouseEvent.GetScreenSpacePosition() - MyGeometry.AbsolutePosition));
+	InputState.SetMousePosition(MouseEvent.GetScreenSpacePosition() - MyGeometry.AbsolutePosition);
 
 	//InputState.SetMousePosition(MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition()));
 	CopyModifierKeys(MouseEvent);
@@ -470,17 +470,14 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 {
 	if (FImGuiContextProxy* ContextProxy = GetContextProxy())
 	{
-		ContextProxy->SetDisplaySize(AllottedGeometry.GetAbsoluteSize());
+		ContextProxy->SetDisplaySize(AllottedGeometry.GetLocalSize());
 
 		// Manually update ImGui context to minimise lag between creating and rendering ImGui output. This will also
 		// keep frame tearing at minimum because it is executed at the very end of the frame.
 		ContextProxy->Tick(FSlateApplication::Get().GetDeltaTime());
 
-		// Calculate offset that will transform vertex positions to screen space - rounded to avoid half pixel offsets.
-		const FVector2D CanvasScreenSpacePosition = MyClippingRect.GetTopLeft();
-
 		// Calculate transform between ImGui canvas ans screen space (scale and then offset in Screen Space).
-		const FTransform2D Transform{ 1.0f, RoundToFloat(CanvasScreenSpacePosition) };
+		const FTransform2D Transform{ AllottedGeometry.Scale, AllottedGeometry.AbsoluteToLocal(MyClippingRect.GetTopLeft()) };
 
 #if WITH_OBSOLETE_CLIPPING_API
 		// Convert clipping rectangle to format required by Slate vertex.

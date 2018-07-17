@@ -67,6 +67,8 @@ FImGuiContextProxy::FImGuiContextProxy(const FString& InName, FSimpleMulticastDe
 	IO.DisplaySize = { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT };
 	DisplaySize = ImGuiInterops::ToVector2D(IO.DisplaySize);
 
+	IO.DisplayFramebufferScale = { DEFAULT_CANVAS_WIDTH_SCALE, DEFAULT_CANVAS_HEIGHT_SCALE };
+
 	// Initialize key mapping, so context can correctly interpret input state.
 	ImGuiInterops::SetUnrealKeyMap(IO);
 
