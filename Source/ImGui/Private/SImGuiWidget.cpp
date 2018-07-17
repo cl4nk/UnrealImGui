@@ -252,7 +252,9 @@ FReply SImGuiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEve
 
 FReply SImGuiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	InputState.SetMousePosition(MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition()));
+	InputState.SetMousePosition((MouseEvent.GetScreenSpacePosition() - MyGeometry.AbsolutePosition));
+
+	//InputState.SetMousePosition(MyGeometry.AbsoluteToLocal(MouseEvent.GetScreenSpacePosition()));
 	CopyModifierKeys(MouseEvent);
 
 	// This event is called in every frame when we have a mouse, so we can use it to raise notifications.
