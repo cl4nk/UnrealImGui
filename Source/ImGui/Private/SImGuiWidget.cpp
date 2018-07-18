@@ -285,36 +285,7 @@ FReply SImGuiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEven
 		CopyModifierKeys(MouseEvent);
 	}
 
-	// This event is called in every frame when we have a mouse, so we can use it to raise notifications.
-	NotifyMouseEvent();
-
 	return FReply::Handled();
-}
-
-FReply SImGuiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
-{
-	Super::OnFocusReceived(MyGeometry, FocusEvent);
-
-	if (ContextProxy)
-	{
-		ContextProxy->RequestInputState(AsShared());
-	}
-
-	//UE_LOG(LogImGuiWidget, VeryVerbose, TEXT("ImGui Widget %d - Focus Received."), ContextIndex);
-
-	return FReply::Handled();
-}
-
-void SImGuiWidget::OnFocusLost(const FFocusEvent& FocusEvent)
-{
-	Super::OnFocusLost(FocusEvent);
-
-	if (ContextProxy)
-	{
-		ContextProxy->ReleaseInputState(AsShared());
-	}
-
-	//UE_LOG(LogImGuiWidget, VeryVerbose, TEXT("ImGui Widget %d - Focus Lost."), ContextIndex);
 }
 
 void SImGuiWidget::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -322,6 +293,11 @@ void SImGuiWidget::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent
 	Super::OnMouseEnter(MyGeometry, MouseEvent);
 
 	//UE_LOG(LogImGuiWidget, VeryVerbose, TEXT("ImGui Widget %d - Mouse Enter."), ContextIndex);
+
+	if (ContextProxy)
+	{
+		ContextProxy->RequestInputState(AsShared());
+	}
 
 	if (FImGuiInputState * InputState = GetInputState())
 	{
@@ -343,6 +319,11 @@ void SImGuiWidget::OnMouseLeave(const FPointerEvent& MouseEvent)
 	if (auto InputState = GetInputState())
 	{
 		InputState->SetMousePointer(false);
+	}
+
+	if (ContextProxy)
+	{
+		ContextProxy->ReleaseInputState(AsShared());
 	}
 }
 

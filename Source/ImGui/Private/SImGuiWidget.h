@@ -60,10 +60,6 @@ public:
 
 	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
-	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent) override;
-
-	virtual void OnFocusLost(const FFocusEvent& FocusEvent) override;
-
 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
@@ -89,10 +85,6 @@ private:
 
 	void SetMouseCursorOverride(EMouseCursor::Type InMouseCursorOverride);
 
-	FORCEINLINE bool HasMouseEventNotification() const { return bReceivedMouseEvent; }
-	FORCEINLINE void NotifyMouseEvent() { bReceivedMouseEvent = true; }
-	FORCEINLINE void ClearMouseEventNotification() { bReceivedMouseEvent = false; }
-
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
 
 	virtual FVector2D ComputeDesiredSize(float) const override;
@@ -107,7 +99,6 @@ private:
 	FImGuiContextProxy * ContextProxy;
 
 	bool bIsFocusable = false;
-	bool bReceivedMouseEvent = false;
 	bool bMouseLock = false;
 
 	EMouseCursor::Type MouseCursorOverride = EMouseCursor::None;
