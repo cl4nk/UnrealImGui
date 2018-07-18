@@ -70,7 +70,7 @@ void SImGuiWidget::Construct(const FArguments& InArgs)
 	SetContextProxy(InArgs._ContextProxy);
 
 	// Disable mouse cursor over this widget as we will use ImGui to draw it.
-	SetCursor(EMouseCursor::None);
+	//SetCursor(EMouseCursor::None);
 
 	// Create ImGui Input Handler.
 	CreateInputHandler();
