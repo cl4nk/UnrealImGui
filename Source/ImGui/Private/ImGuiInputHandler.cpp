@@ -70,15 +70,12 @@ bool UImGuiInputHandler::IsStopPlaySessionEvent(const FKeyEvent& KeyEvent) const
 
 bool UImGuiInputHandler::HasImGuiActiveItem() const
 {
-	FImGuiContextProxy* ContextProxy = ModuleManager->GetContextManager().GetContextProxy(ContextIndex);
-	return ContextProxy && ContextProxy->HasActiveItem();
+	return Widget.IsValid()/*&& ContextProxy->HasActiveItem()*/;
 }
 
-void UImGuiInputHandler::Initialize(FImGuiModuleManager* InModuleManager, UGameViewportClient* InGameViewport, int32 InContextIndex)
+void UImGuiInputHandler::Initialize(TSharedRef<SWidget const> InWidget)
 {
-	ModuleManager = InModuleManager;
-	GameViewport = InGameViewport;
-	ContextIndex = InContextIndex;
+	Widget = InWidget;
 
 #if WITH_EDITOR
 	StopPlaySessionCommandInfo = FInputBindingManager::Get().FindCommandInContext("PlayWorld", "StopPlaySession");

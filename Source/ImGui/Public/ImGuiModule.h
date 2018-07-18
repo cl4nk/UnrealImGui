@@ -6,6 +6,7 @@
 
 #include <ModuleManager.h>
 
+class FImGuiModuleManager;
 
 class FImGuiModule : public IModuleInterface
 {
@@ -32,26 +33,6 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("ImGui");
 	}
 
-#if WITH_EDITOR
-	/**
-	 * Add a delegate called at the end of editor debug frame to draw debug controls in its ImGui context, creating
-	 * that context on demand.
-	 *
-	 * @param Delegate - Delegate that we want to add (@see FImGuiDelegate::Create...)
-	 * @returns Returns handle that can be used to remove delegate (@see RemoveImGuiDelegate)
-	 */
-	virtual FImGuiDelegateHandle AddEditorImGuiDelegate(const FImGuiDelegate& Delegate);
-#endif
-
-	/**
-	 * Add a delegate called at the end of current world debug frame to draw debug controls in its ImGui context,
-	 * creating that context on demand.
-	 * This function will throw if called outside of a world context (i.e. current world cannot be found).
-	 *
-	 * @param Delegate - Delegate that we want to add (@see FImGuiDelegate::Create...)
-	 * @returns Returns handle that can be used to remove delegate (@see RemoveImGuiDelegate)
-	 */
-	virtual FImGuiDelegateHandle AddWorldImGuiDelegate(const FImGuiDelegate& Delegate);
 
 	/**
 	 * Add shared delegate called for each ImGui context at the end of debug frame, after calling context specific
@@ -69,24 +50,6 @@ public:
 	 */
 	virtual void RemoveImGuiDelegate(const FImGuiDelegateHandle& Handle);
 
-	/**
-	 * Check whether Input Mode is enabled (tests ImGui.InputEnabled console variable).
-	 *
-	 * @returns True, if Input Mode is enabled (ImGui.InputEnabled != 0) and false otherwise.
-	 */
-	virtual bool IsInputMode() const;
-
-	/**
-	 * Set Input Mode state (sets ImGui.InputEnabled console variable, so it can be used together with a console).
-	 *
-	 * @param bEnabled - Whether Input Mode should be enabled (ImGui.InputEnabled = 1) or not (ImGui.InputEnabled = 0).
-	 */
-	virtual void SetInputMode(bool bEnabled);
-
-	/**
-	 * Toggle Input Mode state (changes ImGui.InputEnabled console variable).
-	 */
-	virtual void ToggleInputMode();
 
 	/**
 	 * Check whether ImGui Demo is shown (tests ImGui.ShowDemo console variable).
@@ -110,4 +73,11 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+protected:
+	FImGuiModuleManager* ImGuiModuleManager = nullptr;
+
+public:
+	FORCEINLINE FImGuiModuleManager* GetImGuiModuleManager() const { return ImGuiModuleManager; }
+
 };

@@ -7,7 +7,7 @@
 
 #include "ImGuiInputHandler.generated.h"
 
-
+class SImGuiWidget;
 class FImGuiModuleManager;
 class UGameViewportClient;
 
@@ -181,15 +181,11 @@ protected:
 
 private:
 
-	void Initialize(FImGuiModuleManager* InModuleManager, UGameViewportClient* InGameViewport, int32 InContextIndex);
+	void Initialize(TSharedRef<SWidget const> InWidget);
 
 	FORCEINLINE FImGuiInputResponse DefaultResponse() { return FImGuiInputResponse{ true, true }; }
 
-	FImGuiModuleManager* ModuleManager = nullptr;
-
-	TWeakObjectPtr<UGameViewportClient> GameViewport;
-
-	int32 ContextIndex = -1;
+	TWeakPtr<SWidget const> Widget;
 
 #if WITH_EDITOR
 	TSharedPtr<FUICommandInfo> StopPlaySessionCommandInfo;

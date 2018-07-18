@@ -2,15 +2,14 @@
 
 #pragma once
 
-class FImGuiModuleManager;
-class UGameViewportClient;
+class SImGuiWidget;
 class UImGuiInputHandler;
 
 class FImGuiInputHandlerFactory
 {
 public:
 
-	static UImGuiInputHandler* NewHandler(FImGuiModuleManager* ModuleManager, UGameViewportClient* GameViewport, int32 ContextIndex);
+	static UImGuiInputHandler* NewHandler(SImGuiWidget * Widget);
 
 	static void ReleaseHandler(UImGuiInputHandler* Handler);
 };

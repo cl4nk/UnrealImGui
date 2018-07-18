@@ -14,9 +14,6 @@
 
 FImGuiModuleManager::FImGuiModuleManager()
 {
-	// Typically we will use viewport created events to add widget to new game viewports.
-	ViewportCreatedHandle = UGameViewportClient::OnViewportCreated().AddRaw(this, &FImGuiModuleManager::OnViewportCreated);
-
 	// Try to register tick delegate (it may fail if Slate application isn't yet ready).
 	RegisterTick();
 
@@ -25,30 +22,10 @@ FImGuiModuleManager::FImGuiModuleManager()
 	{
 		CreateTickInitializer();
 	}
-
-	// We need to add widgets to active game viewports as they won't generate on-created events. This is especially
-	// important during hot-reloading.
-	AddWidgetsToActiveViewports();
 }
 
 FImGuiModuleManager::~FImGuiModuleManager()
 {
-	// We are no longer interested with adding widgets to viewports.
-	if (ViewportCreatedHandle.IsValid())
-	{
-		UGameViewportClient::OnViewportCreated().Remove(ViewportCreatedHandle);
-		ViewportCreatedHandle.Reset();
-	}
-
-	// Remove still active widgets (important during hot-reloading).
-	for (auto& Widget : Widgets)
-	{
-		if (Widget.IsValid())
-		{
-			Widget.Pin()->Detach();
-		}
-	}
-
 	// Deactivate this manager.
 	ReleaseTickInitializer();
 	UnregisterTick();
@@ -149,57 +126,18 @@ void FImGuiModuleManager::Tick(float DeltaSeconds)
 	}
 }
 
-void FImGuiModuleManager::OnViewportCreated()
+FImGuiContextProxy * FImGuiModuleManager::GetContextProxy(UWorld * World, const FName & ContextName)
 {
-	checkf(FSlateApplication::IsInitialized(), TEXT("We expect Slate to be initialized when game viewport is created."));
+	// Create and initialize the widget.
 
-	// Create widget to viewport responsible for this event.
-	AddWidgetToViewport(GEngine->GameViewport);
-}
-
-void FImGuiModuleManager::AddWidgetToViewport(UGameViewportClient* GameViewport)
-{
-	checkf(GameViewport, TEXT("Null game viewport."));
 	checkf(FSlateApplication::IsInitialized(), TEXT("Slate should be initialized before we can add widget to game viewports."));
 
 	// Make sure that we have a context for this viewport's world and get its index.
-	int32 ContextIndex;
-	auto& Proxy = ContextManager.GetWorldContextProxy(*GameViewport->GetWorld(), ContextIndex);
+
+	auto Proxy = ContextManager.GetWorldContextProxy(World, ContextName);
 
 	// Make sure that textures are loaded before the first Slate widget is created.
 	LoadTextures();
 
-	// Create and initialize the widget.
-	TSharedPtr<SImGuiWidget> SharedWidget;
-	SAssignNew(SharedWidget, SImGuiWidget).ModuleManager(this).GameViewport(GameViewport).ContextIndex(ContextIndex);
-
-	// We transfer widget ownerships to viewports but we keep weak references in case we need to manually detach active
-	// widgets during module shutdown (important during hot-reloading).
-	if (TWeakPtr<SImGuiWidget>* Slot = Widgets.FindByPredicate([](auto& Widget) { return !Widget.IsValid(); }))
-	{
-		*Slot = SharedWidget;
-	}
-	else
-	{
-		Widgets.Emplace(SharedWidget);
-	}
-}
-
-void FImGuiModuleManager::AddWidgetsToActiveViewports()
-{
-	if (FSlateApplication::IsInitialized() && GEngine)
-	{
-		// Loop as long as we have a valid viewport or until we detect a cycle.
-		UGameViewportClient* GameViewport = GEngine->GameViewport;
-		while (GameViewport)
-		{
-			AddWidgetToViewport(GameViewport);
-
-			GameViewport = GEngine->GetNextPIEViewport(GameViewport);
-			if (GameViewport == GEngine->GameViewport)
-			{
-				break;
-			}
-		}
-	}
+	return Proxy;
 }

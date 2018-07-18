@@ -10,7 +10,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogImGuiInputHandlerFactory, Warning, All);
 
-UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(FImGuiModuleManager* ModuleManager, UGameViewportClient* GameViewport, int32 ContextIndex)
+UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(SImGuiWidget* Widget)
 {
 	UClass* HandlerClass = nullptr;
 	if (UImGuiSettings* Settings = GetMutableDefault<UImGuiSettings>())
@@ -32,10 +32,10 @@ UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(FImGuiModuleManager* M
 		HandlerClass = UImGuiInputHandler::StaticClass();
 	}
 
-	UImGuiInputHandler* Handler = NewObject<UImGuiInputHandler>(GameViewport, HandlerClass);
+	UImGuiInputHandler* Handler = NewObject<UImGuiInputHandler>(HandlerClass);
 	if (Handler)
 	{
-		Handler->Initialize(ModuleManager, GameViewport, ContextIndex);
+		Handler->Initialize(Widget->AsShared());
 		Handler->AddToRoot();
 	}
 	else

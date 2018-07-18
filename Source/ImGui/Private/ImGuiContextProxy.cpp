@@ -13,6 +13,8 @@
 static constexpr float DEFAULT_CANVAS_WIDTH = 3840.f;
 static constexpr float DEFAULT_CANVAS_HEIGHT = 2160.f;
 
+static constexpr float DEFAULT_CANVAS_WIDTH_SCALE = 1.f;
+static constexpr float DEFAULT_CANVAS_HEIGHT_SCALE = 1.f;
 
 namespace CVars
 {
@@ -65,6 +67,8 @@ FImGuiContextProxy::FImGuiContextProxy(const FString& InName, FSimpleMulticastDe
 	IO.DisplaySize = { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT };
 	DisplaySize = ImGuiInterops::ToVector2D(IO.DisplaySize);
 
+	IO.DisplayFramebufferScale = { DEFAULT_CANVAS_WIDTH_SCALE, DEFAULT_CANVAS_HEIGHT_SCALE };
+
 	// Initialize key mapping, so context can correctly interpret input state.
 	ImGuiInterops::SetUnrealKeyMap(IO);
 
@@ -84,6 +88,58 @@ FImGuiContextProxy::~FImGuiContextProxy()
 		// Save context data and destroy.
 		ImGui::DestroyContext(Context.Release());
 	}
+}
+
+void FImGuiContextProxy::RequestInputState(TSharedRef<SWidget const> Asker)
+{
+	InputRequests.AddUnique(Asker);
+}
+
+void FImGuiContextProxy::ReleaseInputState(TSharedRef<SWidget const> Asker)
+{
+	TSharedPtr<SWidget const> AskerPtr(Asker);
+	InputRequests.RemoveAll([AskerPtr](const TWeakPtr<SWidget const>& ObjToCompare)
+	{
+		if (ObjToCompare.IsValid())
+		{
+			return ObjToCompare.HasSameObject(AskerPtr.Get());
+		}
+		// Erase null elements inside the list. Asker should not be null
+		return true;
+	});
+}
+
+FImGuiInputState * FImGuiContextProxy::TryGetInputState(SWidget const * Asker)
+{
+	// Find a valid pointer
+	while (InputRequests.Num() > 0)
+	{
+		if (InputRequests[0].IsValid())
+		{
+			return InputRequests[0].HasSameObject(Asker) ? GetInputState() : nullptr;
+		}
+		else
+		{
+			// Remove invalid pointers
+			InputRequests.RemoveAt(0);
+		}
+	}
+
+	return nullptr;
+}
+
+void FImGuiContextProxy::SetDisplaySize(const FVector2D & Size)
+{
+	ImGuiContext * OldContext = ImGui::GetCurrentContext();
+
+	SetAsCurrent();
+
+	ImGuiIO& IO = ImGui::GetIO();
+
+	IO.DisplaySize = { Size.X, Size.Y };
+	DisplaySize = Size;
+
+	ImGui::SetCurrentContext(OldContext);
 }
 
 void FImGuiContextProxy::Draw()
@@ -149,10 +205,7 @@ void FImGuiContextProxy::BeginFrame(float DeltaTime)
 		ImGuiIO& IO = ImGui::GetIO();
 		IO.DeltaTime = DeltaTime;
 
-		if (InputState)
-		{
-			ImGuiInterops::CopyInput(IO, *InputState);
-		}
+		ImGuiInterops::CopyInput(IO, InputState);
 
 		ImGui::NewFrame();
 

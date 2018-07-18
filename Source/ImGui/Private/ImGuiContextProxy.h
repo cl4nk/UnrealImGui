@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ImGuiInputState.h"
 #include "ImGuiDrawData.h"
 
 #include <ICursor.h>
@@ -11,7 +12,8 @@
 #include <string>
 
 
-class FImGuiInputState;
+
+class SImGuiWidget;
 
 // Represents a single ImGui context. All the context updates should be done through this proxy. During update it
 // broadcasts draw events to allow listeners draw their controls. After update it stores draw data.
@@ -35,13 +37,14 @@ public:
 	const TArray<FImGuiDrawList>& GetDrawData() const { return DrawLists; }
 
 	// Get input state used by this context.
-	const FImGuiInputState* GetInputState() const { return InputState; }
+	FImGuiInputState * GetInputState() const { return const_cast<FImGuiInputState *>(&InputState); }
 
-	// Set input state to be used by this context.
-	void SetInputState(const FImGuiInputState* SourceInputState) { InputState = SourceInputState; }
+	void RequestInputState(TSharedRef<SWidget const> Asker);
 
-	// If context is currently using input state to remove then remove that binding.
-	void RemoveInputState(const FImGuiInputState* InputStateToRemove) { if (InputState == InputStateToRemove) InputState = nullptr; }
+	void ReleaseInputState(TSharedRef<SWidget const> Asker);
+
+	// Get input state used by this context.
+	FImGuiInputState* TryGetInputState(SWidget const * Asker);
 
 	// Is this context the current ImGui context.
 	bool IsCurrentContext() const { return ImGui::GetCurrentContext() == Context.Get(); }
@@ -51,6 +54,8 @@ public:
 
 	// Context display size (read once per frame during context update and cached here for easy access).
 	const FVector2D& GetDisplaySize() const { return DisplaySize; }
+
+	void SetDisplaySize(const FVector2D& Size);
 
 	// Whether this context has an active item (read once per frame during context update and cached here for easy access).
 	bool HasActiveItem() const { return bHasActiveItem; }
@@ -90,7 +95,9 @@ private:
 	FSimpleMulticastDelegate DrawEvent;
 	FSimpleMulticastDelegate* SharedDrawEvent = nullptr;
 
-	const FImGuiInputState* InputState = nullptr;
+	FImGuiInputState InputState;
+
+	TArray<TWeakPtr<SWidget const>> InputRequests;
 
 	TArray<FImGuiDrawList> DrawLists;
 

@@ -37,22 +37,26 @@ namespace
 	}
 
 	// Name for world ImGui context.
-	FORCEINLINE FString GetWorldContextName(const UWorld& World)
+	FORCEINLINE FString GetWorldContextName(const UWorld* World)
 	{
 		using namespace Utilities;
 
 		const FWorldContext* WorldContext = GetWorldContext(World);
-		switch (WorldContext->WorldType)
+		if (WorldContext)
 		{
-		case EWorldType::PIE:
-			return FString::Printf(TEXT("PIEContext%d"), GetWorldContextIndex(*WorldContext));
-		case EWorldType::Game:
-			return TEXT("Game");
-		case EWorldType::Editor:
-			return TEXT("Editor");
-		default:
-			return TEXT("Other");
+			switch (WorldContext->WorldType)
+			{
+			case EWorldType::PIE:
+				return FString::Printf(TEXT("PIEContext%d"), GetWorldContextIndex(*WorldContext));
+			case EWorldType::Game:
+				return TEXT("Game");
+			case EWorldType::Editor:
+				return TEXT("Editor");
+			default:
+				return TEXT("Other");
+			}
 		}
+		return TEXT("Null");
 	}
 
 #else
@@ -75,8 +79,6 @@ FImGuiContextManager::FImGuiContextManager()
 	unsigned char* Pixels;
 	int Width, Height, Bpp;
 	FontAtlas.GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
-
-	FWorldDelegates::OnWorldTickStart.AddRaw(this, &FImGuiContextManager::OnWorldTickStart);
 }
 
 FImGuiContextManager::~FImGuiContextManager()
@@ -92,105 +94,42 @@ void FImGuiContextManager::Tick(float DeltaSeconds)
 
 	for (auto& Pair : Contexts)
 	{
-		auto& ContextData = Pair.Value;
-		if (ContextData.CanTick())
-		{
-			ContextData.ContextProxy.Tick(DeltaSeconds);
-		}
-	}
-}
-
-void FImGuiContextManager::OnWorldTickStart(ELevelTick TickType, float DeltaSeconds)
-{
-	if (GWorld)
-	{
-		FImGuiContextProxy& ContextProxy = GetWorldContextProxy(*GWorld);
-		ContextProxy.SetAsCurrent();
-		if (CVars::DebugDrawOnWorldTick.GetValueOnGameThread() > 0)
-		{
-			ContextProxy.Draw();
-		}
+		auto& ContextProxy = Pair.Value;
+		ContextProxy.Tick(DeltaSeconds);
 	}
 }
 
 #if WITH_EDITOR
-FImGuiContextManager::FContextData& FImGuiContextManager::GetEditorContextData()
+FImGuiContextProxy* FImGuiContextManager::GetEditorContextProxy()
 {
-	FContextData* Data = Contexts.Find(Utilities::EDITOR_CONTEXT_INDEX);
+	FImGuiContextProxy* Data = Contexts.Find("");
 
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Utilities::EDITOR_CONTEXT_INDEX, FContextData{ GetEditorContextName(), Utilities::EDITOR_CONTEXT_INDEX, DrawMultiContextEvent, FontAtlas, ImGuiDemo, -1 });
+		Data = &Contexts.Emplace("", FImGuiContextProxy("", &DrawMultiContextEvent, &FontAtlas));
 	}
 
-	return *Data;
+	return Data;
 }
 #endif // WITH_EDITOR
 
-#if !WITH_EDITOR
-FImGuiContextManager::FContextData& FImGuiContextManager::GetStandaloneWorldContextData()
-{
-	FContextData* Data = Contexts.Find(Utilities::STANDALONE_GAME_CONTEXT_INDEX);
-
-	if (UNLIKELY(!Data))
-	{
-		Data = &Contexts.Emplace(Utilities::STANDALONE_GAME_CONTEXT_INDEX, FContextData{ GetWorldContextName(), Utilities::STANDALONE_GAME_CONTEXT_INDEX, DrawMultiContextEvent, FontAtlas, ImGuiDemo });
-	}
-
-	return *Data;
-}
-#endif // !WITH_EDITOR
-
-FImGuiContextManager::FContextData& FImGuiContextManager::GetWorldContextData(const UWorld& World, int32* OutIndex)
+FImGuiContextProxy* FImGuiContextManager::GetWorldContextProxy(const UWorld* World, const FName & Key)
 {
 	using namespace Utilities;
 
 #if WITH_EDITOR
-	if (World.WorldType == EWorldType::Editor)
+	if (World == nullptr || World->WorldType == EWorldType::Editor || World->WorldType == EWorldType::EditorPreview)
 	{
-		if (OutIndex)
-		{
-			*OutIndex = Utilities::EDITOR_CONTEXT_INDEX;
-		}
-
-		return GetEditorContextData();
+		return GetEditorContextProxy();
 	}
 #endif
 
-	const FWorldContext* WorldContext = GetWorldContext(World);
-	const int32 Index = GetWorldContextIndex(*WorldContext);
+	FImGuiContextProxy* Data = Contexts.Find(Key);
 
-	checkf(Index != Utilities::INVALID_CONTEXT_INDEX, TEXT("Couldn't find context index for world %s: WorldType = %d"),
-		*World.GetName(), static_cast<int32>(World.WorldType));
-
-#if WITH_EDITOR
-	checkf(!GEngine->IsEditor() || Index != Utilities::EDITOR_CONTEXT_INDEX,
-		TEXT("Context index %d is reserved for editor and cannot be used for world %s: WorldType = %d, NetMode = %d"),
-		Index, *World.GetName(), static_cast<int32>(World.WorldType), static_cast<int32>(World.GetNetMode()));
-#endif
-
-	FContextData* Data = Contexts.Find(Index);
-
-#if WITH_EDITOR
 	if (UNLIKELY(!Data))
 	{
-		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, FontAtlas, ImGuiDemo, WorldContext->PIEInstance });
+		Data = &Contexts.Emplace(Key, FImGuiContextProxy(Key.ToString(), &DrawMultiContextEvent, &FontAtlas));
 	}
-	else
-	{
-		// Because we allow (for the sake of continuity) to map different PIE instances to the same index.
-		Data->PIEInstance = WorldContext->PIEInstance;
-	}
-#else
-	if (UNLIKELY(!Data))
-	{
-		Data = &Contexts.Emplace(Index, FContextData{ GetWorldContextName(World), Index, DrawMultiContextEvent, FontAtlas, ImGuiDemo });
-	}
-#endif
 
-	if (OutIndex)
-	{
-		*OutIndex = Index;
-	}
-	return *Data;
+	return Data;
 }
