@@ -1,15 +1,15 @@
 // Distributed under the MIT License (MIT) (see accompanying LICENSE file)
 
 #pragma once
-
-#include "ImGuiContextManager.h"
-#include "SImGuiWidget.h"
-#include "TextureManager.h"
+#include <CoreMinimal.h>
 
 class FImGuiContextProxy;
+class FImGuiContextManager;
+class FTextureManager;
+
 
 // Central manager that implements module logic. It initializes and controls remaining module components.
-class FImGuiModuleManager
+class IMGUI_API FImGuiModuleManager
 {
 	// Allow module to control life-cycle of this class.
 	friend class FImGuiModule;
@@ -17,20 +17,24 @@ class FImGuiModuleManager
 public:
 
 	// Get ImGui contexts manager.
-	FImGuiContextManager& GetContextManager() { return ContextManager; }
+	FImGuiContextManager& GetContextManager() { return *ContextManager; }
 
 	// Get texture resources manager.
-	FTextureManager& GetTextureManager() { return TextureManager; }
+	FTextureManager& GetTextureManager() { return *TextureManager; }
 
 	// Event called right after ImGui is updated, to give other subsystems chance to react.
 	FSimpleMulticastDelegate& OnPostImGuiUpdate() { return PostImGuiUpdateEvent; }
 
+	virtual void SetContextAsCurrent(UWorld * World, const FName & ContextName);
+
 	FImGuiContextProxy * GetContextProxy(UWorld * World, const FName & ContextName);
+
+protected:
+	virtual ~FImGuiModuleManager();
 
 private:
 
 	FImGuiModuleManager();
-	~FImGuiModuleManager();
 
 	FImGuiModuleManager(const FImGuiModuleManager&) = delete;
 	FImGuiModuleManager& operator=(const FImGuiModuleManager&) = delete;
@@ -55,10 +59,10 @@ private:
 	FSimpleMulticastDelegate PostImGuiUpdateEvent;
 
 	// Manager for ImGui contexts.
-	FImGuiContextManager ContextManager;
+	FImGuiContextManager * ContextManager;
 
 	// Manager for textures resources.
-	FTextureManager TextureManager;
+	FTextureManager * TextureManager;
 
 	FDelegateHandle TickInitializerHandle;
 	FDelegateHandle TickDelegateHandle;

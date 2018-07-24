@@ -19,6 +19,20 @@ void UImGuiWidget::SetAsCurrent() const
 	}
 }
 
+void UImGuiWidget::SetContextName(FName const & InContextName)
+{
+	ContextName = InContextName;
+	if (MyImGuiWidget.IsValid())
+	{
+		//Module should be loaded, the check is inside the get
+		FImGuiModule& ImGuiModule = FImGuiModule::Get();
+
+		FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
+
+		MyImGuiWidget->SetContextProxy(ImGuiModuleManager ? ImGuiModuleManager->GetContextProxy(GetWorld(), ContextName) : nullptr);
+	}
+}
+
 void UImGuiWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);

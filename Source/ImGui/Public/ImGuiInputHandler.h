@@ -4,7 +4,6 @@
 
 #include <CoreMinimal.h>
 #include <UObject/Object.h>
-
 #include "ImGuiInputHandler.generated.h"
 
 class SImGuiWidget;

@@ -2,6 +2,9 @@
 
 #include "ImGuiPrivatePCH.h"
 
+#include "TextureManager.h"
+#include "ImGuiContextManager.h"
+
 #include "ImGuiModuleManager.h"
 
 #include "ImGuiInteroperability.h"
@@ -11,9 +14,10 @@
 
 #include <imgui.h>
 
-
 FImGuiModuleManager::FImGuiModuleManager()
 {
+	ContextManager = new FImGuiContextManager();
+	TextureManager = new FTextureManager();
 	// Try to register tick delegate (it may fail if Slate application isn't yet ready).
 	RegisterTick();
 
@@ -22,10 +26,18 @@ FImGuiModuleManager::FImGuiModuleManager()
 	{
 		CreateTickInitializer();
 	}
+
+	
 }
 
 FImGuiModuleManager::~FImGuiModuleManager()
 {
+	delete ContextManager;
+	ContextManager = nullptr;
+
+	delete TextureManager;
+	TextureManager = nullptr;
+
 	// Deactivate this manager.
 	ReleaseTickInitializer();
 	UnregisterTick();
@@ -40,16 +52,16 @@ void FImGuiModuleManager::LoadTextures()
 		bTexturesLoaded = true;
 
 		// Create an empty texture at index 0. We will use it for ImGui outputs with null texture id.
-		TextureManager.CreatePlainTexture(FName{ "ImGuiModule_Plain" }, 2, 2, FColor::White);
+		TextureManager->CreatePlainTexture(FName{ "ImGuiModule_Plain" }, 2, 2, FColor::White);
 
 		// Create a font atlas texture.
-		ImFontAtlas& Fonts = ContextManager.GetFontAtlas();
+		ImFontAtlas& Fonts = ContextManager->GetFontAtlas();
 
 		unsigned char* Pixels;
 		int Width, Height, Bpp;
 		Fonts.GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
 
-		TextureIndex FontsTexureIndex = TextureManager.CreateTexture(FName{ "ImGuiModule_FontAtlas" }, Width, Height, Bpp, Pixels, false);
+		TextureIndex FontsTexureIndex = TextureManager->CreateTexture(FName{ "ImGuiModule_FontAtlas" }, Width, Height, Bpp, Pixels, false);
 
 		// Set font texture index in ImGui.
 		Fonts.TexID = ImGuiInterops::ToImTextureID(FontsTexureIndex);
@@ -119,10 +131,20 @@ void FImGuiModuleManager::Tick(float DeltaSeconds)
 	if (IsInUpdateThread())
 	{
 		// Update context manager to advance all ImGui contexts to the next frame.
-		ContextManager.Tick(DeltaSeconds);
+		ContextManager->Tick(DeltaSeconds);
 
 		// Inform that we finished updating ImGui, so other subsystems can react.
 		PostImGuiUpdateEvent.Broadcast();
+	}
+}
+
+void FImGuiModuleManager::SetContextAsCurrent(UWorld * World, const FName & ContextName)
+{
+	FImGuiContextProxy * Proxy = GetContextProxy(World, ContextName);
+
+	if (Proxy)
+	{
+		Proxy->SetAsCurrent();
 	}
 }
 
@@ -134,7 +156,7 @@ FImGuiContextProxy * FImGuiModuleManager::GetContextProxy(UWorld * World, const 
 
 	// Make sure that we have a context for this viewport's world and get its index.
 
-	auto Proxy = ContextManager.GetWorldContextProxy(World, ContextName);
+	auto Proxy = ContextManager->GetWorldContextProxy(World, ContextName);
 
 	// Make sure that textures are loaded before the first Slate widget is created.
 	LoadTextures();

@@ -15,13 +15,6 @@
 
 #define LOCTEXT_NAMESPACE "FImGuiModule"
 
-
-namespace CVars
-{
-	extern TAutoConsoleVariable<int32> InputEnabled;
-	extern TAutoConsoleVariable<int32> ShowDemo;
-}
-
 struct EDelegateCategory
 {
 	enum
@@ -86,17 +79,6 @@ void FImGuiModule::ShutdownModule()
 	checkf(ImGuiModuleManager, TEXT("Null ImGui Module Manager. Module manager instance should be deleted during module shutdown."));
 	delete ImGuiModuleManager;
 	ImGuiModuleManager = nullptr;
-}
-
-bool FImGuiModule::IsShowingDemo() const
-{
-	return CVars::ShowDemo.GetValueOnAnyThread() > 0;
-}
-
-void FImGuiModule::SetShowDemo(bool bShow)
-{
-	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	CVars::ShowDemo->Set(bShow ? 1 : 0, ECVF_SetByConsole);
 }
 
 void FImGuiModule::ToggleShowDemo()

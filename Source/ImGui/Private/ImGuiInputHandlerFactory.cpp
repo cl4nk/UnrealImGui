@@ -2,6 +2,8 @@
 
 #include "ImGuiPrivatePCH.h"
 
+#include "SImGuiWidget.h"
+
 #include "ImGuiInputHandlerFactory.h"
 
 #include "ImGuiInputHandler.h"
