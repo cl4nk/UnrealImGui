@@ -81,11 +81,6 @@ void FImGuiModule::ShutdownModule()
 	ImGuiModuleManager = nullptr;
 }
 
-void FImGuiModule::ToggleShowDemo()
-{
-	SetShowDemo(!IsShowingDemo());
-}
-
 #undef LOCTEXT_NAMESPACE
 
 IMPLEMENT_MODULE(FImGuiModule, ImGui)
