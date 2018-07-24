@@ -19,6 +19,12 @@ class UImGuiWidget : public UWidget
 	
 public:
 
+	UFUNCTION(BlueprintCallable)
+	void SetContextName(FName const & InContextName);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName ContextName;
+
 	/** Sometimes a button should only be mouse-clickable and never keyboard focusable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
 	bool IsFocusable;

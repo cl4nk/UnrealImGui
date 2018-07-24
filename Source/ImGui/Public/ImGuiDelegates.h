@@ -25,21 +25,21 @@ public:
 	void Reset()
 	{
 		Handle.Reset();
-		Index = 0;
+		Name = "";
 	}
 
 private:
 
-	FImGuiDelegateHandle(const FDelegateHandle& InHandle, int32 InCategory, int32 InIndex = 0)
+	FImGuiDelegateHandle(const FDelegateHandle& InHandle, int32 InCategory, FString InName = "")
 		: Handle(InHandle)
 		, Category(InCategory)
-		, Index(InIndex)
+		, Name(InName)
 	{
 	}
 
 	friend bool operator==(const FImGuiDelegateHandle& Lhs, const FImGuiDelegateHandle& Rhs)
 	{
-		return Lhs.Handle == Rhs.Handle && Lhs.Category == Rhs.Category && Lhs.Index == Rhs.Index;
+		return Lhs.Handle == Rhs.Handle && Lhs.Category == Rhs.Category && Lhs.Name == Rhs.Name;
 	}
 
 	friend bool operator!=(const FImGuiDelegateHandle& Lhs, const FImGuiDelegateHandle& Rhs)
@@ -49,7 +49,7 @@ private:
 
 	FDelegateHandle Handle;
 	int32 Category = 0;
-	int32 Index = 0;
+	FString Name;
 
 	friend class FImGuiModule;
 };

@@ -19,6 +19,20 @@ void UImGuiWidget::SetAsCurrent() const
 	}
 }
 
+void UImGuiWidget::SetContextName(FName const & InContextName)
+{
+	ContextName = InContextName;
+	if (MyImGuiWidget.IsValid())
+	{
+		//Module should be loaded, the check is inside the get
+		FImGuiModule& ImGuiModule = FImGuiModule::Get();
+
+		FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
+
+		MyImGuiWidget->SetContextProxy(ImGuiModuleManager ? ImGuiModuleManager->GetContextProxy(GetWorld(), ContextName) : nullptr);
+	}
+}
+
 void UImGuiWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);
@@ -28,19 +42,14 @@ void UImGuiWidget::ReleaseSlateResources(bool bReleaseChildren)
 
 TSharedRef<SWidget> UImGuiWidget::RebuildWidget()
 {
-	if (FImGuiModule::IsAvailable())
-	{
-		FImGuiModule& ImGuiModule = FImGuiModule::Get();
+	//Module should be loaded, the check is inside the get
+	FImGuiModule& ImGuiModule = FImGuiModule::Get();
 
-		FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
+	FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
 
-		int32 ContextIndex = ImGuiModuleManager ? ImGuiModuleManager->GetContextIndex(GetWorld()) : 0;
-
-		MyImGuiWidget = SNew(SImGuiWidget).
-			ModuleManager(ImGuiModuleManager).
-			ContextIndex(ContextIndex).
-			IsFocusable(IsFocusable);
-	}
+	MyImGuiWidget = SNew(SImGuiWidget).
+		IsFocusable(IsFocusable).
+		ContextProxy(ImGuiModuleManager ? ImGuiModuleManager->GetContextProxy(GetWorld(), ContextName) : nullptr);
 	
 	return MyImGuiWidget.ToSharedRef();
 }

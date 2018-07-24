@@ -15,13 +15,6 @@
 
 #define LOCTEXT_NAMESPACE "FImGuiModule"
 
-
-namespace CVars
-{
-	extern TAutoConsoleVariable<int32> InputEnabled;
-	extern TAutoConsoleVariable<int32> ShowDemo;
-}
-
 struct EDelegateCategory
 {
 	enum
@@ -38,41 +31,6 @@ struct EDelegateCategory
 static FImGuiEditor* ImGuiEditor = nullptr;
 #endif
 
-#if WITH_EDITOR
-FImGuiDelegateHandle FImGuiModule::AddEditorImGuiDelegate(const FImGuiDelegate& Delegate)
-{
-	checkf(ImGuiModuleManager, TEXT("Null pointer to internal module implementation. Is module available?"));
-
-	return { ImGuiModuleManager->GetContextManager().GetEditorContextProxy().OnDraw().Add(Delegate),
-		EDelegateCategory::Default, Utilities::EDITOR_CONTEXT_INDEX };
-}
-#endif
-
-FImGuiDelegateHandle FImGuiModule::AddWorldImGuiDelegate(const FImGuiDelegate& Delegate)
-{
-	checkf(ImGuiModuleManager, TEXT("Null pointer to internal module implementation. Is module available?"));
-
-#if WITH_EDITOR
-	checkf(GEngine, TEXT("Null GEngine. AddWorldImGuiDelegate should be only called with GEngine initialized."));
-
-	const FWorldContext* WorldContext = Utilities::GetWorldContext(GEngine->GameViewport);
-	if (!WorldContext)
-	{
-		WorldContext = Utilities::GetWorldContextFromNetMode(ENetMode::NM_DedicatedServer);
-	}
-
-	checkf(WorldContext, TEXT("Couldn't find current world. AddWorldImGuiDelegate should be only called from a valid world."));
-
-	int32 Index;
-	FImGuiContextProxy& Proxy = ImGuiModuleManager->GetContextManager().GetWorldContextProxy(WorldContext->World(), Index);
-#else
-	const int32 Index = Utilities::STANDALONE_GAME_CONTEXT_INDEX;
-	FImGuiContextProxy& Proxy = ImGuiModuleManager->GetContextManager().GetWorldContextProxy();
-#endif
-
-	return{ Proxy.OnDraw().Add(Delegate), EDelegateCategory::Default, Index };
-}
-
 FImGuiDelegateHandle FImGuiModule::AddMultiContextImGuiDelegate(const FImGuiDelegate& Delegate)
 {
 	checkf(ImGuiModuleManager, TEXT("Null pointer to internal module implementation. Is module available?"));
@@ -88,7 +46,7 @@ void FImGuiModule::RemoveImGuiDelegate(const FImGuiDelegateHandle& Handle)
 		{
 			ImGuiModuleManager->GetContextManager().OnDrawMultiContext().Remove(Handle.Handle);
 		}
-		else if (auto* Proxy = ImGuiModuleManager->GetContextManager().GetContextProxy(Handle.Index))
+		else if (auto* Proxy = ImGuiModuleManager->GetContextManager().GetContextProxy(*Handle.Name))
 		{
 			Proxy->OnDraw().Remove(Handle.Handle);
 		}
@@ -121,22 +79,6 @@ void FImGuiModule::ShutdownModule()
 	checkf(ImGuiModuleManager, TEXT("Null ImGui Module Manager. Module manager instance should be deleted during module shutdown."));
 	delete ImGuiModuleManager;
 	ImGuiModuleManager = nullptr;
-}
-
-bool FImGuiModule::IsShowingDemo() const
-{
-	return CVars::ShowDemo.GetValueOnAnyThread() > 0;
-}
-
-void FImGuiModule::SetShowDemo(bool bShow)
-{
-	// This function is for supporting shortcut or subsitiute for console command, so we are using the same priority.
-	CVars::ShowDemo->Set(bShow ? 1 : 0, ECVF_SetByConsole);
-}
-
-void FImGuiModule::ToggleShowDemo()
-{
-	SetShowDemo(!IsShowingDemo());
 }
 
 #undef LOCTEXT_NAMESPACE

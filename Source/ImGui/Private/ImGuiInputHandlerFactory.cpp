@@ -2,6 +2,8 @@
 
 #include "ImGuiPrivatePCH.h"
 
+#include "SImGuiWidget.h"
+
 #include "ImGuiInputHandlerFactory.h"
 
 #include "ImGuiInputHandler.h"
@@ -10,7 +12,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogImGuiInputHandlerFactory, Warning, All);
 
-UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(FImGuiModuleManager* ModuleManager, int32 ContextIndex)
+UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(SImGuiWidget* Widget)
 {
 	UClass* HandlerClass = nullptr;
 	if (UImGuiSettings* Settings = GetMutableDefault<UImGuiSettings>())
@@ -35,7 +37,7 @@ UImGuiInputHandler* FImGuiInputHandlerFactory::NewHandler(FImGuiModuleManager* M
 	UImGuiInputHandler* Handler = NewObject<UImGuiInputHandler>(HandlerClass);
 	if (Handler)
 	{
-		Handler->Initialize(ModuleManager, ContextIndex);
+		Handler->Initialize(Widget->AsShared());
 		Handler->AddToRoot();
 	}
 	else

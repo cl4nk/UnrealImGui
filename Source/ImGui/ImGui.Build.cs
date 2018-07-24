@@ -20,7 +20,7 @@ public class ImGui : ModuleRules
 
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"ImGui/Public",
+                Path.Combine(ModuleDirectory, "Public"),
 				Path.Combine(ModuleDirectory, "../ThirdParty/ImGuiLibrary/Include")
 				// ... add public include paths required here ...
 			}
@@ -29,8 +29,8 @@ public class ImGui : ModuleRules
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"ImGui/Private",
-				"ThirdParty/ImGuiLibrary/Private"
+                Path.Combine(ModuleDirectory, "Private"),
+				Path.Combine(ModuleDirectory, "../ThirdParty/ImGuiLibrary/Private")
 				// ... add other private include paths required here ...
 			}
 			);

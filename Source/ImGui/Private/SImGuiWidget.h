@@ -19,27 +19,22 @@ class SImGuiWidget : public SLeafWidget
 public:
 
 	SLATE_BEGIN_ARGS(SImGuiWidget)
-		: _ModuleManager(nullptr)
-		, _ContextIndex (0)
-		, _IsFocusable(true)
+		: _IsFocusable(true)
+		, _ContextProxy(nullptr)
 	{} 
 
-		SLATE_ARGUMENT(FImGuiModuleManager*, ModuleManager)
-		SLATE_ARGUMENT(int32, ContextIndex)
 		SLATE_ARGUMENT(bool, IsFocusable)
+		SLATE_ARGUMENT(FImGuiContextProxy * , ContextProxy)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
 
 	~SImGuiWidget();
 
+	void SetContextProxy(FImGuiContextProxy * ContextProxy);
+
 	FImGuiContextProxy* GetContextProxy() const;
 
-	// Get index of the context that this widget is targeting.
-	int32 GetContextIndex() const { return ContextIndex; }
-
-	// Get input state associated with this widget.
-	const FImGuiInputState& GetInputState() const { return InputState; }
 
 	//----------------------------------------------------------------------------------------------------
 	// SWidget overrides
@@ -65,10 +60,6 @@ public:
 
 	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
-	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent) override;
-
-	virtual void OnFocusLost(const FFocusEvent& FocusEvent) override;
-
 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override;
@@ -76,6 +67,9 @@ public:
 	virtual FCursorReply OnCursorQuery(const FGeometry& MyGeometry, const FPointerEvent& CursorEvent) const override;
 
 	virtual bool IsInteractable() const override;
+
+	FORCEINLINE FImGuiInputState * GetInputState() const;
+	
 
 private:
 
@@ -91,28 +85,20 @@ private:
 
 	void SetMouseCursorOverride(EMouseCursor::Type InMouseCursorOverride);
 
-	FORCEINLINE bool HasMouseEventNotification() const { return bReceivedMouseEvent; }
-	FORCEINLINE void NotifyMouseEvent() { bReceivedMouseEvent = true; }
-	FORCEINLINE void ClearMouseEventNotification() { bReceivedMouseEvent = false; }
-
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
 
 	virtual FVector2D ComputeDesiredSize(float) const override;
 
 	void OnDebugDraw();
 
-	FImGuiModuleManager* ModuleManager = nullptr;
 	TWeakObjectPtr<UImGuiInputHandler> InputHandler;
 
 	mutable TArray<FSlateVertex> VertexBuffer;
 	mutable TArray<SlateIndex> IndexBuffer;
 
-	int32 ContextIndex = 0;
-
-	FImGuiInputState InputState;
+	FImGuiContextProxy * ContextProxy;
 
 	bool bIsFocusable = false;
-	bool bReceivedMouseEvent = false;
 	bool bMouseLock = false;
 
 	EMouseCursor::Type MouseCursorOverride = EMouseCursor::None;

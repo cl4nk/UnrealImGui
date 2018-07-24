@@ -2,14 +2,14 @@
 
 #pragma once
 
-class FImGuiModuleManager;
+class SImGuiWidget;
 class UImGuiInputHandler;
 
 class FImGuiInputHandlerFactory
 {
 public:
 
-	static UImGuiInputHandler* NewHandler(FImGuiModuleManager* ModuleManager, int32 ContextIndex);
+	static UImGuiInputHandler* NewHandler(SImGuiWidget * Widget);
 
 	static void ReleaseHandler(UImGuiInputHandler* Handler);
 };
