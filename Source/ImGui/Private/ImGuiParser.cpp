@@ -16,28 +16,33 @@ void UImGuiParser::ParseStruct(UStruct * Struct, void * StructValue, bool Includ
 {
 	static FString StringID;
 
-	StringID.Append(Struct->GetName());
-	
-	ImGuiUtils::Columns::TwoColumnsTab(TCHAR_TO_ANSI(*StringID), 2, [&]()
+	EFieldIteratorFlags::SuperClassFlags SuperClassFlags = IncludeSuper ? EFieldIteratorFlags::IncludeSuper : EFieldIteratorFlags::ExcludeSuper;
+	TFieldIterator<UProperty> PropertyIt(Struct, SuperClassFlags);
+
+	// Test outside the ImGuiUtils call to prevent a blank space due to the empty tab
+	if (PropertyIt)
 	{
-		EFieldIteratorFlags::SuperClassFlags SuperClassFlags = IncludeSuper ? EFieldIteratorFlags::IncludeSuper : EFieldIteratorFlags::ExcludeSuper;
+		StringID.Append(Struct->GetName());
 
-		for (TFieldIterator<UProperty> PropertyIt(Struct, SuperClassFlags); PropertyIt; ++PropertyIt)
+		ImGuiUtils::Columns::TwoColumnsTab(TCHAR_TO_ANSI(*StringID), 2, [&]()
 		{
-			UProperty* Property = *PropertyIt;
-			const FString & PropertyName = Property->GetName();
-
-			for (int32 Index = 0; Index < PropertyIt->ArrayDim; Index++)
+			for (; PropertyIt; ++PropertyIt)
 			{
-				ImGui::Text("%ls:", *PropertyName); ImGui::NextColumn();
+				UProperty* Property = *PropertyIt;
+				const FString & PropertyName = Property->GetName();
 
-				void * PropertyValue = Property->ContainerPtrToValuePtr<void>(StructValue, Index);
-				ParseProperty(Property, PropertyValue); ImGui::NextColumn();
+				for (int32 Index = 0; Index < PropertyIt->ArrayDim; Index++)
+				{
+					ImGui::Text("%ls:", *PropertyName); ImGui::NextColumn();
+
+					void * PropertyValue = Property->ContainerPtrToValuePtr<void>(StructValue, Index);
+					ParseProperty(Property, PropertyValue); ImGui::NextColumn();
+				}
 			}
-		}
-	});
+		});
 
-	StringID.RemoveFromEnd(Struct->GetName());
+		StringID.RemoveFromEnd(Struct->GetName());
+	}
 }
 
 void UImGuiParser::ParseProperty(UProperty * Property, void * PropertyValue)
