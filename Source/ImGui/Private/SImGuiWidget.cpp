@@ -15,6 +15,7 @@
 #include "TextureManager.h"
 #include "Utilities/Arrays.h"
 #include "Utilities/ScopeGuards.h"
+#include "ImGuiUtils.h"
 
 #include <Engine/Console.h>
 
@@ -32,7 +33,6 @@ DEFINE_LOG_CATEGORY_STATIC(LogImGuiWidget, Warning, All);
 	(Val) == EInputMode::MousePointerOnly ? TEXT("MousePointerOnly") :\
 	TEXT("None"))
 
-#define TEXT_BOOL(Val) ((Val) ? TEXT("true") : TEXT("false"))
 
 
 namespace
@@ -616,97 +616,6 @@ static TArray<FKey> GetImGuiMappedKeys()
 	return Keys;
 }
 
-// Column layout utilities.
-namespace Columns
-{
-	template<typename FunctorType>
-	static void CollapsingGroup(const char* Name, int Columns, FunctorType&& DrawContent)
-	{
-		if (ImGui::CollapsingHeader(Name, ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			const int LastColumns = ImGui::GetColumnsCount();
-			ImGui::Columns(Columns, nullptr, false);
-			DrawContent();
-			ImGui::Columns(LastColumns);
-		}
-	}
-}
-
-// Controls tweaked for 2-columns layout.
-namespace TwoColumns
-{
-	template<typename FunctorType>
-	static inline void CollapsingGroup(const char* Name, FunctorType&& DrawContent)
-	{
-		Columns::CollapsingGroup(Name, 2, std::forward<FunctorType>(DrawContent));
-	}
-
-	namespace
-	{
-		void LabelText(const char* Label)
-		{
-			ImGui::Text("%s:", Label);
-		}
-
-		void LabelText(const wchar_t* Label)
-		{
-			ImGui::Text("%ls:", Label);
-		}
-	}
-
-	template<typename LabelType>
-	static void Value(LabelType&& Label, int32 Value)
-	{
-		LabelText(Label); ImGui::NextColumn();
-		ImGui::Text("%d", Value); ImGui::NextColumn();
-	}
-
-	template<typename LabelType>
-	static void Value(LabelType&& Label, uint32 Value)
-	{
-		LabelText(Label); ImGui::NextColumn();
-		ImGui::Text("%u", Value); ImGui::NextColumn();
-	}
-
-	template<typename LabelType>
-	static void Value(LabelType&& Label, float Value)
-	{
-		LabelText(Label); ImGui::NextColumn();
-		ImGui::Text("%f", Value); ImGui::NextColumn();
-	}
-
-	template<typename LabelType>
-	static void Value(LabelType&& Label, bool bValue)
-	{
-		LabelText(Label); ImGui::NextColumn();
-		ImGui::Text("%ls", TEXT_BOOL(bValue)); ImGui::NextColumn();
-	}
-
-	template<typename LabelType>
-	static void Value(LabelType&& Label, const TCHAR* Value)
-	{
-		LabelText(Label); ImGui::NextColumn();
-		ImGui::Text("%ls", Value); ImGui::NextColumn();
-	}
-}
-
-namespace Styles
-{
-	template<typename FunctorType>
-	static void TextHighlight(bool bHighlight, FunctorType&& DrawContent)
-	{
-		if (bHighlight)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Text, { 1.f, 1.f, 0.5f, 1.f });
-		}
-		DrawContent();
-		if (bHighlight)
-		{
-			ImGui::PopStyleColor();
-		}
-	}
-}
-
 void SImGuiWidget::OnDebugDraw()
 {
 	if (CVars::DebugWidget.GetValueOnGameThread() > 0)
@@ -715,6 +624,8 @@ void SImGuiWidget::OnDebugDraw()
 		ImGui::SetNextWindowSize(ImVec2(380, 480), ImGuiSetCond_Once);
 		if (ImGui::Begin("ImGui Widget Debug", &bDebug))
 		{
+			using namespace ImGuiUtils;
+
 			ImGui::Spacing();
 
 			TwoColumns::CollapsingGroup("Context", [&]()
