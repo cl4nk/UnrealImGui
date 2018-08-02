@@ -10,22 +10,20 @@ namespace ImGuiUtils
 	namespace Columns
 	{
 		template<typename FunctorType>
-		static void TwoColumnsTab(const char * Id, int Columns, FunctorType&& DrawContent)
+		static void TwoColumnsTab(int Columns, FunctorType&& DrawContent)
 		{
-			ImGui::BeginChild(Id);
 			const int LastColumns = ImGui::GetColumnsCount();
 			ImGui::Columns(Columns, nullptr, false);
 			DrawContent();
 			ImGui::Columns(LastColumns);	
-			ImGui::EndChild();
 		}
 
 		template<typename FunctorType>
-		static void CollapsingTwoColumnsTab(const char * Id, const char* Name, int Columns, FunctorType&& DrawContent)
+		static void CollapsingTwoColumnsTab(const char* Name, int Columns, FunctorType&& DrawContent)
 		{
 			if (ImGui::CollapsingHeader(Name, ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				TwoColumnsTab(Id, Columns, std::forward<FunctorType>(DrawContent));
+				TwoColumnsTab(Columns, std::forward<FunctorType>(DrawContent));
 			}
 		}
 	}
@@ -36,7 +34,7 @@ namespace ImGuiUtils
 		template<typename FunctorType>
 		static inline void CollapsingGroup(const char* Name, FunctorType&& DrawContent)
 		{
-			Columns::CollapsingTwoColumnsTab(Name, Name, 2, std::forward<FunctorType>(DrawContent));
+			Columns::CollapsingTwoColumnsTab(Name, 2, std::forward<FunctorType>(DrawContent));
 		}
 
 		namespace

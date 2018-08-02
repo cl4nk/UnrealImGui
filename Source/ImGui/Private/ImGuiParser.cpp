@@ -9,22 +9,21 @@
 
 void UImGuiParser::ParseObject(UObject * Object, bool IncludeSuper)
 {
-	ParseStruct(Object->GetClass(), Object, IncludeSuper);
+	if (Object != nullptr && !Object->IsPendingKill())
+	{
+		ParseStruct(Object->GetClass(), Object, IncludeSuper);
+	}
 }
 
 void UImGuiParser::ParseStruct(UStruct * Struct, void * StructValue, bool IncludeSuper)
 {
-	static FString StringID;
-
-	EFieldIteratorFlags::SuperClassFlags SuperClassFlags = IncludeSuper ? EFieldIteratorFlags::IncludeSuper : EFieldIteratorFlags::ExcludeSuper;
-	TFieldIterator<UProperty> PropertyIt(Struct, SuperClassFlags);
-
-	// Test outside the ImGuiUtils call to prevent a blank space due to the empty tab
-	if (PropertyIt)
+	if (Struct && StructValue)
 	{
-		StringID.Append(Struct->GetName());
+		EFieldIteratorFlags::SuperClassFlags SuperClassFlags = IncludeSuper ? EFieldIteratorFlags::IncludeSuper : EFieldIteratorFlags::ExcludeSuper;
+		TFieldIterator<UProperty> PropertyIt(Struct, SuperClassFlags);
 
-		ImGuiUtils::Columns::TwoColumnsTab(TCHAR_TO_ANSI(*StringID), 2, [&]()
+		// Test outside the ImGuiUtils call to prevent a blank space due to the empty tab
+		if (PropertyIt)
 		{
 			for (; PropertyIt; ++PropertyIt)
 			{
@@ -33,15 +32,22 @@ void UImGuiParser::ParseStruct(UStruct * Struct, void * StructValue, bool Includ
 
 				for (int32 Index = 0; Index < PropertyIt->ArrayDim; Index++)
 				{
-					ImGui::Text("%ls:", *PropertyName); ImGui::NextColumn();
+					ImGui::Text("%ls:", *PropertyName); ImGui::SameLine();
+
+					ImGui::Spacing();   ImGui::SameLine();
 
 					void * PropertyValue = Property->ContainerPtrToValuePtr<void>(StructValue, Index);
-					ParseProperty(Property, PropertyValue); ImGui::NextColumn();
+					ParseProperty(Property, PropertyValue);
+
+					ImGui::Spacing();
+					if (Index < PropertyIt->ArrayDim - 1)
+					{
+						ImGui::Separator();
+						ImGui::Spacing();
+					}
 				}
 			}
-		});
-
-		StringID.RemoveFromEnd(Struct->GetName());
+		}
 	}
 }
 
@@ -58,29 +64,34 @@ void UImGuiParser::ParseProperty(UProperty * Property, void * PropertyValue)
 	else if (UArrayProperty * ArrayProperty = Cast<UArrayProperty>(Property))
 	{
 		FScriptArrayHelper ArrayHelper(ArrayProperty, PropertyValue);
-		FString CollapsingHeaderTitle = FString::Printf(TEXT("Array, Size = %d"), ArrayHelper.Num());
-
-		if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*CollapsingHeaderTitle), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ArrayHelper.Num() > 0)
 		{
-			for (int32 i = 0; i < ArrayHelper.Num(); i++)
+			FString CollapsingHeaderTitle = FString::Printf(TEXT("Array, Size = %d"), ArrayHelper.Num());
+			ImGui::BeginGroup();
+			if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*CollapsingHeaderTitle), ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				uint8* PropData = ArrayHelper.GetRawPtr(i);
-				ParseProperty(ArrayProperty->Inner, PropData);
+				for (int32 i = 0; i < ArrayHelper.Num(); i++)
+				{
+					uint8* PropData = ArrayHelper.GetRawPtr(i);
+					ParseProperty(ArrayProperty->Inner, PropData);
+				}
 			}
+			ImGui::EndGroup();
 		}
 	}
 	else if (UMapProperty * MapProperty = Cast<UMapProperty>(Property))
 	{
 		FScriptMapHelper MapHelper(MapProperty, PropertyValue);
 
-		uint8* PropData = MapHelper.GetPairPtr(0); //Maybe prefer without check
-
-		int32 Index = 0;
-		FString CollapsingHeaderTitle = FString::Printf(TEXT("Map, Size = %d"), MapHelper.Num());
-
-		if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*CollapsingHeaderTitle), ImGuiTreeNodeFlags_DefaultOpen))
+		if (MapHelper.Num() > 0)
 		{
-			ImGuiUtils::Columns::TwoColumnsTab(TCHAR_TO_ANSI(*MapProperty->GetFullName()), 2, [&]()
+			uint8* PropData = MapHelper.GetPairPtr(0); //Maybe prefer without check
+
+			int32 Index = 0;
+			FString CollapsingHeaderTitle = FString::Printf(TEXT("Map, Size = %d"), MapHelper.Num());
+			ImGui::BeginGroup();
+
+			if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*CollapsingHeaderTitle), ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				for (int32 Count = MapHelper.Num(); Count; PropData += MapProperty->MapLayout.SetLayout.Size, ++Index)
 				{
@@ -88,14 +99,15 @@ void UImGuiParser::ParseProperty(UProperty * Property, void * PropertyValue)
 					{
 						FString ValueString;
 						ParseProperty(MapProperty->KeyProp, PropData);
-						ImGui::NextColumn();
+						ImGui::SameLine();
 						ParseProperty(MapProperty->ValueProp, PropData + MapProperty->MapLayout.ValueOffset);
-						ImGui::NextColumn();
 
 						--Count;
 					}
 				}
-			});
+			}
+
+			ImGui::EndGroup();
 		}
 	}
 	else if (UStructProperty * StructProperty = Cast<UStructProperty>(Property))
@@ -142,10 +154,16 @@ void UImGuiParser::ParseProperty(UProperty * Property, void * PropertyValue)
 		}
 		else
 		{
+			//ImGui::Indent();
+			ImGui::BeginGroup();
+
 			if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*StructProperty->Struct->GetFName().ToString()), ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ParseStruct(StructProperty->Struct, PropertyValue, true);
 			}
+
+			ImGui::EndGroup();
+			//ImGui::Unindent();
 		}
 	}
 	else
