@@ -19,7 +19,7 @@ void UImGuiWidget::SetAsCurrent() const
 	}
 }
 
-void UImGuiWidget::SetContextName(FName const & InContextName)
+void UImGuiWidget::SetContextName(FName InContextName)
 {
 	ContextName = InContextName;
 	if (MyImGuiWidget.IsValid())

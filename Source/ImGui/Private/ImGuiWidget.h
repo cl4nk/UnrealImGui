@@ -20,7 +20,7 @@ class UImGuiWidget : public UWidget
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void SetContextName(FName const & InContextName);
+	void SetContextName(FName InContextName);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ContextName;
