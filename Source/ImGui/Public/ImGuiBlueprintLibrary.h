@@ -4,10 +4,9 @@
 #include "ImGuiBlueprintLibrary.generated.h"
 
 // Flags for ImGui::Begin()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiWindowFlags_
 {
-	EImGuiWindowFlags_None = 0,
 	EImGuiWindowFlags_NoTitleBar = 1 << 0,   // Disable title-bar
 	EImGuiWindowFlags_NoResize = 1 << 1,   // Disable user resizing with the lower-right grip
 	EImGuiWindowFlags_NoMove = 1 << 2,   // Disable user moving the window
@@ -15,7 +14,7 @@ enum EImGuiWindowFlags_
 	EImGuiWindowFlags_NoScrollWithMouse = 1 << 4,   // Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
 	EImGuiWindowFlags_NoCollapse = 1 << 5,   // Disable user collapsing window by double-clicking on it
 	EImGuiWindowFlags_AlwaysAutoResize = 1 << 6,   // Resize every window to its content every frame
-	//EImGuiWindowFlags_ShowBorders          = 1 << 7,   // Show borders around windows and items (OBSOLETE! Use e.g. style.FrameBorderSize=1.0f to enable borders).
+	EImGuiWindowFlags_ShowBorders          = 1 << 7,   // Show borders around windows and items (OBSOLETE! Use e.g. style.FrameBorderSize=1.0f to enable borders).
 	EImGuiWindowFlags_NoSavedSettings = 1 << 8,   // Never load/save settings in .ini file
 	EImGuiWindowFlags_NoInputs = 1 << 9,   // Disable catching mouse or keyboard inputs, hovering test with pass through.
 	EImGuiWindowFlags_MenuBar = 1 << 10,  // Has a menu-bar
@@ -28,14 +27,12 @@ enum EImGuiWindowFlags_
 	EImGuiWindowFlags_ResizeFromAnySide = 1 << 17,  // [BETA] Enable resize from any corners and borders. Your back-end needs to honor the different values of io.MouseCursor set by imgui.
 	EImGuiWindowFlags_NoNavInputs = 1 << 18,  // No gamepad/keyboard navigation within the window
 	EImGuiWindowFlags_NoNavFocus = 1 << 19,  // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
-	EImGuiWindowFlags_NoNav = EImGuiWindowFlags_NoNavInputs | EImGuiWindowFlags_NoNavFocus,
 };
 
 // Flags for ImGui::InputText()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiInputTextFlags_
 {
-	EImGuiInputTextFlags_None = 0,
 	EImGuiInputTextFlags_CharsDecimal = 1 << 0,   // Allow 0123456789.+-*/
 	EImGuiInputTextFlags_CharsHexadecimal = 1 << 1,   // Allow 0123456789ABCDEFabcdef
 	EImGuiInputTextFlags_CharsUppercase = 1 << 2,   // Turn a..z into A..Z
@@ -57,10 +54,9 @@ enum EImGuiInputTextFlags_
 };
 
 // Flags for ImGui::TreeNodeEx(), ImGui::CollapsingHeader*()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiTreeNodeFlags_
 {
-	EImGuiTreeNodeFlags_None = 0,
 	EImGuiTreeNodeFlags_Selected = 1 << 0,   // Draw as selected
 	EImGuiTreeNodeFlags_Framed = 1 << 1,   // Full colored frame (e.g. for CollapsingHeader)
 	EImGuiTreeNodeFlags_AllowItemOverlap = 1 << 2,   // Hit testing to allow subsequent widgets to overlap this one
@@ -72,27 +68,24 @@ enum EImGuiTreeNodeFlags_
 	EImGuiTreeNodeFlags_Leaf = 1 << 8,   // No collapsing, no arrow (use as a convenience for leaf nodes).
 	EImGuiTreeNodeFlags_Bullet = 1 << 9,   // Display a bullet instead of arrow
 	EImGuiTreeNodeFlags_FramePadding = 1 << 10,  // Use FramePadding (even for an unframed text node) to vertically align text baseline to regular widget height. Equivalent to calling AlignTextToFramePadding().
-	//EImGuITreeNodeFlags_SpanAllAvailWidth  = 1 << 11,  // FIXME: TODO: Extend hit box horizontally even if not framed
-	//EImGuiTreeNodeFlags_NoScrollOnOpen     = 1 << 12,  // FIXME: TODO: Disable automatic scroll on TreePop() if node got just open and contents is not visible
+	EImGuITreeNodeFlags_SpanAllAvailWidth  = 1 << 11,  // FIXME: TODO: Extend hit box horizontally even if not framed
+	EImGuiTreeNodeFlags_NoScrollOnOpen     = 1 << 12,  // FIXME: TODO: Disable automatic scroll on TreePop() if node got just open and contents is not visible
 	EImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 13,  // (WIP) Nav: left direction may move to this TreeNode() from any of its child (items submitted between TreeNode and TreePop)
-	EImGuiTreeNodeFlags_CollapsingHeader = EImGuiTreeNodeFlags_Framed | EImGuiTreeNodeFlags_NoTreePushOnOpen | EImGuiTreeNodeFlags_NoAutoOpenOnLog
 };
 
 // Flags for ImGui::Selectable()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiSelectableFlags_
 {
-	EImGuiSelectableFlags_None = 0,
 	EImGuiSelectableFlags_DontClosePopups = 1 << 0,   // Clicking this don't close parent popup window
 	EImGuiSelectableFlags_SpanAllColumns = 1 << 1,   // Selectable frame can span all columns (text will still fit in current column)
 	EImGuiSelectableFlags_AllowDoubleClick = 1 << 2    // Generate press events on double clicks too
 };
 
 // Flags for ImGui::BeginCombo()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiComboFlags_
 {
-	EImGuiComboFlags_None = 0,
 	EImGuiComboFlags_PopupAlignLeft = 1 << 0,   // Align the popup toward the left by default
 	EImGuiComboFlags_HeightSmall = 1 << 1,   // Max ~4 items visible. Tip: If you want your combo popup to be a specific size you can use SetNextWindowSizeConstraints() prior to calling BeginCombo()
 	EImGuiComboFlags_HeightRegular = 1 << 2,   // Max ~8 items visible (default)
@@ -100,42 +93,35 @@ enum EImGuiComboFlags_
 	EImGuiComboFlags_HeightLargest = 1 << 4,   // As many fitting items as possible
 	EImGuiComboFlags_NoArrowButton = 1 << 5,   // Display on the preview box without the square arrow button
 	EImGuiComboFlags_NoPreview = 1 << 6,   // Display only a square arrow button
-	EImGuiComboFlags_HeightMask_ = EImGuiComboFlags_HeightSmall | EImGuiComboFlags_HeightRegular | EImGuiComboFlags_HeightLarge | EImGuiComboFlags_HeightLargest
 };
 
 // Flags for ImGui::IsWindowFocused()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiFocusedFlags_
 {
-	EImGuiFocusedFlags_None = 0,
 	EImGuiFocusedFlags_ChildWindows = 1 << 0,   // IsWindowFocused(): Return true if any children of the window is focused
 	EImGuiFocusedFlags_RootWindow = 1 << 1,   // IsWindowFocused(): Test from root window (top most parent of the current hierarchy)
 	EImGuiFocusedFlags_AnyWindow = 1 << 2,   // IsWindowFocused(): Return true if any window is focused
-	EImGuiFocusedFlags_RootAndChildWindows = EImGuiFocusedFlags_RootWindow | EImGuiFocusedFlags_ChildWindows
 };
 
 // Flags for ImGui::IsItemHovered(), ImGui::IsWindowHovered()
 // Note: If you are trying to check whether your mouse should be dispatched to imgui or to your app, you should use the 'io.WantCaptureMouse' boolean for that. Please read the FAQ!
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiHoveredFlags_
 {
-	EImGuiHoveredFlags_None = 0,        // Return true if directly over the item/window, not obstructed by another window, not obstructed by an active popup or modal blocking inputs under them.
 	EImGuiHoveredFlags_ChildWindows = 1 << 0,   // IsWindowHovered() only: Return true if any children of the window is hovered
 	EImGuiHoveredFlags_RootWindow = 1 << 1,   // IsWindowHovered() only: Test from root window (top most parent of the current hierarchy)
 	EImGuiHoveredFlags_AnyWindow = 1 << 2,   // IsWindowHovered() only: Return true if any window is hovered
 	EImGuiHoveredFlags_AllowWhenBlockedByPopup = 1 << 3,   // Return true even if a popup window is normally blocking access to this item/window
-	//EImGuiHoveredFlags_AllowWhenBlockedByModal     = 1 << 4,   // Return true even if a modal popup window is normally blocking access to this item/window. FIXME-TODO: Unavailable yet.
+	EImGuiHoveredFlags_AllowWhenBlockedByModal     = 1 << 4,   // Return true even if a modal popup window is normally blocking access to this item/window. FIXME-TODO: Unavailable yet.
 	EImGuiHoveredFlags_AllowWhenBlockedByActiveItem = 1 << 5,   // Return true even if an active item is blocking access to this item/window. Useful for Drag and Drop patterns.
 	EImGuiHoveredFlags_AllowWhenOverlapped = 1 << 6,   // Return true even if the position is overlapped by another window
-	EImGuiHoveredFlags_RectOnly = EImGuiHoveredFlags_AllowWhenBlockedByPopup | EImGuiHoveredFlags_AllowWhenBlockedByActiveItem | EImGuiHoveredFlags_AllowWhenOverlapped,
-	EImGuiHoveredFlags_RootAndChildWindows = EImGuiHoveredFlags_RootWindow | EImGuiHoveredFlags_ChildWindows
 };
 
 // Flags for ImGui::BeginDragDropSource(), ImGui::AcceptDragDropPayload()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiDragDropFlags_
 {
-	EImGuiDragDropFlags_None = 0,
 	// BeginDragDropSource() flags
 	EImGuiDragDropFlags_SourceNoPreviewTooltip = 1 << 0,   // By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disable this behavior.
 	EImGuiDragDropFlags_SourceNoDisableHover = 1 << 1,   // By default, when dragging we clear data so that IsItemHovered() will return true, to avoid subsequent user code submitting tooltips. This flag disable this behavior so you can still call IsItemHovered() on the source item.
@@ -146,7 +132,6 @@ enum EImGuiDragDropFlags_
 	EImGuiDragDropFlags_AcceptBeforeDelivery = 1 << 10,  // AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.
 	EImGuiDragDropFlags_AcceptNoDrawDefaultRect = 1 << 11,  // Do not draw the default highlight rectangle when hovering over target.
 	EImGuiDragDropFlags_AcceptNoPreviewTooltip = 1 << 12,  // Request hiding the BeginDragDropSource tooltip from the BeginDragDropTarget site.
-	EImGuiDragDropFlags_AcceptPeekOnly = EImGuiDragDropFlags_AcceptBeforeDelivery | EImGuiDragDropFlags_AcceptNoDrawDefaultRect  // For peeking ahead and inspecting the payload before delivery.
 };
 
 // A primary data type
@@ -229,7 +214,7 @@ enum EImGuiNavInput_
 };
 
 // Configuration flags stored in io.ConfigFlags. Set by user/application.
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiConfigFlags_
 {
 	EImGuiConfigFlags_NavEnableKeyboard = 1 << 0,   // Master keyboard navigation enable flag. NewFrame() will automatically fill io.NavInputs[] based on io.KeysDown[].
@@ -245,7 +230,7 @@ enum EImGuiConfigFlags_
 };
 
 // Back-end capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom back-end.
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiBackendFlags_
 {
 	EImGuiBackendFlags_HasGamepad = 1 << 0,   // Back-end supports gamepad and currently has one connected.
@@ -334,10 +319,9 @@ enum EImGuiStyleVar_
 };
 
 // Enumeration for ColorEdit3() / ColorEdit4() / ColorPicker3() / ColorPicker4() / ColorButton()
-UENUM(BlueprintType, meta = (Bitflags))
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EImGuiColorEditFlags_
 {
-	EImGuiColorEditFlags_None = 0,
 	EImGuiColorEditFlags_NoAlpha = 1 << 1,   //              // ColorEdit, ColorPicker, ColorButton: ignore Alpha component (read 3 components from the input pointer).
 	EImGuiColorEditFlags_NoPicker = 1 << 2,   //              // ColorEdit: disable picker when clicking on colored square.
 	EImGuiColorEditFlags_NoOptions = 1 << 3,   //              // ColorEdit: disable toggling options menu when right-clicking on inputs/small preview.
@@ -578,8 +562,8 @@ public:
 
 	// Widgets: Color Editor/Picker (tip: the ColorEdit* functions have a little colored preview square that can be left-clicked to open a picker, and right-clicked to open an option menu.)
 	// Note that a 'float v[X]' function argument is the same as 'float* v', the array syntax is just a way to document the number of elements that are expected to be accessible. You can the pass the address of a first float element out of a contiguous structure, e.g. &myvector.x
-	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static bool          ColorEdit(FString label, FLinearColor col, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags = 0);
-	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static bool          ColorPicker(FString label, FLinearColor col, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags = 0);
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static bool          ColorEdit(FString label, UPARAM(ref) FLinearColor& col, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags = 0);
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static bool          ColorPicker(FString label, UPARAM(ref) FLinearColor& col, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static bool          ColorButton(FString desc_id, FLinearColor col, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags = 0, FVector2D size = FVector2D(0, 0));  // display a colored square/button, hover for details, return true when pressed.
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Color")) static void          SetColorEditOptions(UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiColorEditFlags_)) int32 flags);                     // initialize current options (generally on application startup) if you want to select a default format, picker type, etc. User will be able to change many settings, unless you pass the _NoOptions flag to your calls.
 

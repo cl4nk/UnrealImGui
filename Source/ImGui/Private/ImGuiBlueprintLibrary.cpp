@@ -682,12 +682,12 @@ bool UImGuiBlueprintLibrary::VSliderInt(FString label, FVector2D size, int& v, i
 	return ImGui::VSliderInt(TCHAR_TO_ANSI(*label), FVEC2_TO_IMVEC2(size), &v, v_min, v_max, TCHAR_TO_ANSI(*format));
 }
 
-bool UImGuiBlueprintLibrary::ColorEdit(FString label, FLinearColor col, int32 flags)
+bool UImGuiBlueprintLibrary::ColorEdit(FString label, FLinearColor& col, int32 flags)
 {
 	return ImGui::ColorEdit4(TCHAR_TO_ANSI(*label), &col.R, flags);
 }
 
-bool UImGuiBlueprintLibrary::ColorPicker(FString label, FLinearColor col, int32 flags)
+bool UImGuiBlueprintLibrary::ColorPicker(FString label, FLinearColor& col, int32 flags)
 {
 	return ImGui::ColorPicker4(TCHAR_TO_ANSI(*label), &col.R, flags);
 }
