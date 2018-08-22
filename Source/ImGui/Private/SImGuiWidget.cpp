@@ -281,7 +281,7 @@ FReply SImGuiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEven
 	auto InputState = GetInputState();
 	if (InputState)
 	{
-		InputState->SetMousePosition(MouseEvent.GetScreenSpacePosition() - MyGeometry.AbsolutePosition);
+		InputState->SetMousePosition(MouseEvent.GetScreenSpacePosition() - MyGeometry.GetAbsolutePosition());
 		CopyModifierKeys(MouseEvent);
 	}
 
@@ -507,14 +507,14 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 {
 	if (FImGuiContextProxy* ContextProxy = GetContextProxy())
 	{
-		ContextProxy->SetDisplaySize(AllottedGeometry.GetLocalSize());
+		ContextProxy->SetDisplaySize(AllottedGeometry.GetAbsoluteSize());
 
 		// Manually update ImGui context to minimise lag between creating and rendering ImGui output. This will also
 		// keep frame tearing at minimum because it is executed at the very end of the frame.
 		ContextProxy->Tick(FSlateApplication::Get().GetDeltaTime());
 
 		// Calculate transform between ImGui canvas ans screen space (scale and then offset in Screen Space).
-		const FTransform2D Transform{ AllottedGeometry.Scale, AllottedGeometry.AbsoluteToLocal(MyClippingRect.GetTopLeft()) };
+		const FTransform2D Transform{ 1.0f, AllottedGeometry.GetAbsolutePosition() };
 
 		FImGuiModule& ImGuiModule = FImGuiModule::Get();
 
