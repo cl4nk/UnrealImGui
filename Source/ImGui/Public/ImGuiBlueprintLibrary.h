@@ -395,6 +395,8 @@ class IMGUI_API UImGuiBlueprintLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui", WorldContext = "WorldContextObject")) 
+	static bool SetCurrentImGuiContext(UObject * WorldContextObject, FName ContextName);
 
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Windows")) static bool          Begin(FString name, UPARAM(ref) bool& p_open, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiWindowFlags_)) int32 flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Windows")) static void          End();
@@ -560,7 +562,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputInt3(FString label, int v[3], EImGuiInputTextFlags_ extra_flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputInt4(FString label, int v[4], EImGuiInputTextFlags_ extra_flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputDouble(FString label, double* v, double step = 0.0f, double step_fast = 0.0f, FString format = "%.6f", EImGuiInputTextFlags_ extra_flags = 0);
-	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputScalar(FString label, EImGuiDataType_ data_type, void* v, const void* step = NULL, const void* step_fast = NULL, FString format = NULL, EImGuiInputTextFlags_ extra_flags = 0);
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputScalar(FSting label, EImGuiDataType_ data_type, void* v, const void* step = NULL, const void* step_fast = NULL, FString format = NULL, EImGuiInputTextFlags_ extra_flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Input with keyboard")) static bool          InputScalarN(FString label, EImGuiDataType_ data_type, void* v, int components, const void* step = NULL, const void* step_fast = NULL, FString format = NULL, EImGuiInputTextFlags_ extra_flags = 0);*/
 
 	// Widgets: Sliders (tip: ctrl+click on a slider to input with keyboard. manually input values aren't clamped, can go off-bounds)

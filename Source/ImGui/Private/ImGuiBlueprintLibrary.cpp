@@ -1,6 +1,7 @@
 #include "ImGuiPrivatePCH.h"
 
 #include "ImGuiBlueprintLibrary.h"
+#include "ImGuiModuleManager.h"
 #include <imgui.h>
 
 #define IMVEC2_TO_FVEC2(vec) FVector2D(vec.x, vec.y)
@@ -10,6 +11,19 @@
 #define FVEC4_TO_IMVEC4(vec) ImVec4(vec.X, vec.Y, vec.Z, vec.W)
 #define COLOR_TO_IMVEC4(vec) ImVec4(vec.R, vec.G, vec.B, vec.A)
 
+bool UImGuiBlueprintLibrary::SetCurrentImGuiContext(UObject * WorldContextObject, FName ContextName)
+{
+	FImGuiModule& ImGuiModule = FImGuiModule::Get();
+	FImGuiModuleManager* ImGuiModuleManager = ImGuiModule.GetImGuiModuleManager();
+
+	if (ImGuiModuleManager)
+	{
+		UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+		ImGuiModuleManager->SetContextAsCurrent(World, ContextName);
+	}
+
+	return ImGuiModuleManager;
+}
 
 bool UImGuiBlueprintLibrary::Begin(FString name, bool& p_open, int32 flags)
 {
