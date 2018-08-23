@@ -584,7 +584,7 @@ void UImGuiBlueprintLibrary::EndCombo()
 #include <string>
 bool UImGuiBlueprintLibrary::ComboArray(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
 {
-	TArray<const std::string> items_str;
+	TArray<std::string> items_str;
 	for (int i = 0; i < items.Num(); ++i)
 	{
 		items_str.Add(std::string(TCHAR_TO_ANSI(*(items[i]))));
