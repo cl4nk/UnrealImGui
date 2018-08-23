@@ -371,7 +371,7 @@ void UImGuiBlueprintLibrary::BeginGroup()
 
 void UImGuiBlueprintLibrary::EndGroup()
 {
-
+	ImGui::EndGroup();
 }
 
 FVector2D UImGuiBlueprintLibrary::GetCursorPos()
@@ -584,7 +584,7 @@ void UImGuiBlueprintLibrary::EndCombo()
 bool UImGuiBlueprintLibrary::ComboArray(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
 {
 	TArray<const char *> items_c;
-	for (FString const str : items)
+	for (FString const &str : items)
 	{
 		items_c.Add(TCHAR_TO_ANSI(*str));
 	}
@@ -775,7 +775,7 @@ bool UImGuiBlueprintLibrary::SelectableByRef(FString label, bool& p_selected, Im
 bool UImGuiBlueprintLibrary::ListBox(FString label, int& current_item, TArray<FString> items, int height_in_items)
 {
 	TArray<const char *> items_c;
-	for (FString const str : items)
+	for (FString const &str : items)
 	{
 		items_c.Add(TCHAR_TO_ANSI(*str));
 	}
