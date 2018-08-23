@@ -25,7 +25,12 @@ bool UImGuiBlueprintLibrary::SetCurrentImGuiContext(UObject * WorldContextObject
 	return ImGuiModuleManager;
 }
 
-bool UImGuiBlueprintLibrary::Begin(FString name, bool& p_open, int32 flags)
+bool UImGuiBlueprintLibrary::Begin(FString name, int32 flags)
+{
+	return ImGui::Begin(TCHAR_TO_ANSI(*name), nullptr, flags);
+}
+
+bool UImGuiBlueprintLibrary::BeginWithOpen(FString name, bool& p_open, int32 flags)
 {
 	return ImGui::Begin(TCHAR_TO_ANSI(*name), &p_open, flags);
 }
@@ -888,7 +893,12 @@ bool UImGuiBlueprintLibrary::BeginPopupContextVoid(FString str_id, int mouse_but
 	return ImGui::BeginPopupContextVoid(TCHAR_TO_ANSI(*str_id), mouse_button);
 }
 
-bool UImGuiBlueprintLibrary::BeginPopupModal(FString name, bool& p_open, int32 flags)
+bool UImGuiBlueprintLibrary::BeginPopupModal(FString name, int32 flags)
+{
+	return ImGui::BeginPopupModal(TCHAR_TO_ANSI(*name), nullptr, flags);
+}
+
+bool UImGuiBlueprintLibrary::BeginPopupModalWithOpen(FString name, bool& p_open, int32 flags)
 {
 	return ImGui::BeginPopupModal(TCHAR_TO_ANSI(*name), &p_open, flags);
 }
