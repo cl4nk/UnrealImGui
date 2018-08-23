@@ -581,12 +581,19 @@ void UImGuiBlueprintLibrary::EndCombo()
 	ImGui::EndCombo();
 }
 
+#include <string>
 bool UImGuiBlueprintLibrary::ComboArray(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
 {
-	TArray<const char *> items_c;
-	for (FString const &str : items)
+	TArray<const std::string> items_str;
+	for (int i = 0; i < items.Num(); ++i)
 	{
-		items_c.Add(TCHAR_TO_ANSI(*str));
+		items_str.Add(std::string(TCHAR_TO_ANSI(*(items[i]))));
+	}
+
+	TArray<const char *> items_c;
+	for (int i = 0; i < items.Num(); ++i)
+	{
+		items_c.Add(items_str[i].c_str());
 	}
 
 	return ImGui::Combo(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items_c.Num(), popup_max_height_in_items);
@@ -774,10 +781,16 @@ bool UImGuiBlueprintLibrary::SelectableByRef(FString label, bool& p_selected, Im
 
 bool UImGuiBlueprintLibrary::ListBox(FString label, int& current_item, TArray<FString> items, int height_in_items)
 {
-	TArray<const char *> items_c;
-	for (FString const &str : items)
+	TArray<std::string> items_str;
+	for (int i = 0; i < items.Num(); ++i)
 	{
-		items_c.Add(TCHAR_TO_ANSI(*str));
+		items_str.Add(std::string(TCHAR_TO_ANSI(*(items[i]))));
+	}
+
+	TArray<const char *> items_c;
+	for (int i = 0; i < items.Num(); ++i)
+	{
+		items_c.Add(items_str[i].c_str());
 	}
 
 	return ImGui::ListBox(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items.Num(), height_in_items);
