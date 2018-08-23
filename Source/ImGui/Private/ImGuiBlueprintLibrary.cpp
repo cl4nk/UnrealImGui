@@ -2,6 +2,7 @@
 
 #include "ImGuiBlueprintLibrary.h"
 #include "ImGuiModuleManager.h"
+#include <string>
 #include <imgui.h>
 
 #define IMVEC2_TO_FVEC2(vec) FVector2D(vec.x, vec.y)
@@ -10,6 +11,29 @@
 #define IMVEC4_TO_FVEC4(vec) FVector4(vec.x, vec.y, vec.z, vec.w)
 #define FVEC4_TO_IMVEC4(vec) ImVec4(vec.X, vec.Y, vec.Z, vec.W)
 #define COLOR_TO_IMVEC4(vec) ImVec4(vec.R, vec.G, vec.B, vec.A)
+
+namespace 
+{
+	inline static TArray<std::string> FStringsToStdStrings(const TArray<FString>& Items)
+	{
+		TArray<std::string> Results;
+		for (FString Item : Items)
+		{
+			Results.Add(std::string(TCHAR_TO_ANSI(*Item)));
+		}
+		return Results;
+	}
+
+	inline static TArray<char const *> StdStringsToCCharPtrs(const TArray<std::string>& Items)
+	{
+		TArray<char const *> Results;
+		for (int i = 0; i < Items.Num(); ++i)
+		{
+			Results.Add(Items[i].c_str());
+		}
+		return Results;
+	}
+}
 
 bool UImGuiBlueprintLibrary::SetCurrentImGuiContext(UObject * WorldContextObject, FName ContextName)
 {
@@ -581,20 +605,10 @@ void UImGuiBlueprintLibrary::EndCombo()
 	ImGui::EndCombo();
 }
 
-#include <string>
 bool UImGuiBlueprintLibrary::ComboArray(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
 {
-	TArray<std::string> items_str;
-	for (int i = 0; i < items.Num(); ++i)
-	{
-		items_str.Add(std::string(TCHAR_TO_ANSI(*(items[i]))));
-	}
-
-	TArray<const char *> items_c;
-	for (int i = 0; i < items.Num(); ++i)
-	{
-		items_c.Add(items_str[i].c_str());
-	}
+	TArray<std::string> items_str = FStringsToStdStrings(items);
+	TArray<const char *> items_c = StdStringsToCCharPtrs(items_str);
 
 	return ImGui::Combo(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items_c.Num(), popup_max_height_in_items);
 }
@@ -781,17 +795,8 @@ bool UImGuiBlueprintLibrary::SelectableByRef(FString label, bool& p_selected, Im
 
 bool UImGuiBlueprintLibrary::ListBox(FString label, int& current_item, TArray<FString> items, int height_in_items)
 {
-	TArray<std::string> items_str;
-	for (int i = 0; i < items.Num(); ++i)
-	{
-		items_str.Add(std::string(TCHAR_TO_ANSI(*(items[i]))));
-	}
-
-	TArray<const char *> items_c;
-	for (int i = 0; i < items.Num(); ++i)
-	{
-		items_c.Add(items_str[i].c_str());
-	}
+	TArray<std::string> items_str = FStringsToStdStrings(items);
+	TArray<const char *> items_c = StdStringsToCCharPtrs(items_str);
 
 	return ImGui::ListBox(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items.Num(), height_in_items);
 }
