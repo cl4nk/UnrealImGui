@@ -25,6 +25,9 @@ public:
 	// Event called right after ImGui is updated, to give other subsystems chance to react.
 	FSimpleMulticastDelegate& OnPostImGuiUpdate() { return PostImGuiUpdateEvent; }
 
+	// Event called right before ImGui is updated, to give other subsystems chance to react.
+	FSimpleMulticastDelegate& OnPreImGuiUpdate() { return PreImGuiUpdateEvent; }
+
 	virtual void SetContextAsCurrent(UWorld * World, const FName & ContextName);
 
 	FImGuiContextProxy * GetContextProxy(UWorld * World, const FName & ContextName);
@@ -54,6 +57,9 @@ private:
 	bool IsInUpdateThread();
 
 	void Tick(float DeltaSeconds);
+
+	// Event that we call before ImGui is updated.
+	FSimpleMulticastDelegate PreImGuiUpdateEvent;
 
 	// Event that we call after ImGui is updated.
 	FSimpleMulticastDelegate PostImGuiUpdateEvent;

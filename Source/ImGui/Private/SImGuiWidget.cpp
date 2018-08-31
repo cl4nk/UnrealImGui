@@ -509,10 +509,6 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 	{
 		ContextProxy->SetDisplaySize(AllottedGeometry.GetAbsoluteSize());
 
-		// Manually update ImGui context to minimise lag between creating and rendering ImGui output. This will also
-		// keep frame tearing at minimum because it is executed at the very end of the frame.
-		ContextProxy->Tick(FSlateApplication::Get().GetDeltaTime());
-
 		// Calculate transform between ImGui canvas ans screen space (scale and then offset in Screen Space).
 		const FTransform2D Transform{ 1.0f, AllottedGeometry.GetAbsolutePosition() };
 

@@ -1,6 +1,7 @@
 #include "ImGuiPrivatePCH.h"
 
 #include "ImGuiBlueprintLibrary.h"
+#include "ImGuiModule.h"
 #include "ImGuiModuleManager.h"
 #include <string>
 #include <imgui.h>

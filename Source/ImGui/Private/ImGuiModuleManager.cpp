@@ -130,6 +130,9 @@ void FImGuiModuleManager::Tick(float DeltaSeconds)
 {
 	if (IsInUpdateThread())
 	{
+		// Inform that we will update ImGui, so other subsystems can react.
+		PreImGuiUpdateEvent.Broadcast();
+
 		// Update context manager to advance all ImGui contexts to the next frame.
 		ContextManager->Tick(DeltaSeconds);
 
