@@ -47,7 +47,7 @@ bool UImGuiBlueprintLibrary::SetCurrentImGuiContext(UObject * WorldContextObject
 		ImGuiModuleManager->SetContextAsCurrent(World, ContextName);
 	}
 
-	return ImGuiModuleManager;
+	return ImGuiModuleManager != nullptr;
 }
 
 bool UImGuiBlueprintLibrary::Begin(FString name, int32 flags)
