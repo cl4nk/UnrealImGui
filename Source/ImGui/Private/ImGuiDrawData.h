@@ -46,12 +46,12 @@ public:
 	// @param OutVertexBuffer - Destination buffer
 	// @param Transform - Transform to apply to all vertices
 	// @param VertexClippingRect - Clipping rectangle for transformed Slate vertices
-	void CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FSlateRotatedRect& VertexClippingRect) const;
+	void CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FWidgetStyle& WidgetStyle, const FSlateRotatedRect& VertexClippingRect) const;
 #else
 	// Transform and copy vertex data to target buffer (old data in the target buffer are replaced).
 	// @param OutVertexBuffer - Destination buffer
 	// @param Transform - Transform to apply to all vertices
-	void CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform) const;
+	void CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FWidgetStyle& WidgetStyle) const;
 #endif // WITH_OBSOLETE_CLIPPING_API
 
 	// Transform and copy index data to target buffer (old data in the target buffer are replaced).

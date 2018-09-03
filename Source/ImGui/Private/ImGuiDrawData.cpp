@@ -6,9 +6,9 @@
 
 
 #if WITH_OBSOLETE_CLIPPING_API
-void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FSlateRotatedRect& VertexClippingRect) const
+void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FWidgetStyle& WidgetStyle, const FSlateRotatedRect& VertexClippingRect) const
 #else
-void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform) const
+void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform, const FWidgetStyle& WidgetStyle) const
 #endif // WITH_OBSOLETE_CLIPPING_API
 {
 	// Reset and reserve space in destination buffer.
@@ -35,7 +35,7 @@ void FImGuiDrawList::CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const
 #endif // WITH_OBSOLETE_CLIPPING_API
 
 		// Unpack ImU32 color.
-		SlateVertex.Color = ImGuiInterops::UnpackImU32Color(ImGuiVertex.col);
+		SlateVertex.Color = (WidgetStyle.GetColorAndOpacityTint() * ImGuiInterops::UnpackImU32Color(ImGuiVertex.col)).ToFColor(true);
 	}
 }
 

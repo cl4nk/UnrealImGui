@@ -524,13 +524,13 @@ int32 SImGuiWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 		for (const auto& DrawList : ContextProxy->GetDrawData())
 		{
 #if WITH_OBSOLETE_CLIPPING_API
-			DrawList.CopyVertexData(VertexBuffer, Transform, VertexClippingRect);
+			DrawList.CopyVertexData(VertexBuffer, Transform, WidgetStyle, VertexClippingRect);
 
 			// Get access to the Slate scissor rectangle defined in Slate Core API, so we can customize elements drawing.
 			extern SLATECORE_API TOptional<FShortRect> GSlateScissorRect;
 			auto GSlateScissorRectSaver = ScopeGuards::MakeStateSaver(GSlateScissorRect);
 #else
-			DrawList.CopyVertexData(VertexBuffer, Transform);
+			DrawList.CopyVertexData(VertexBuffer, Transform, WidgetStyle);
 #endif // WITH_OBSOLETE_CLIPPING_API
 
 			int IndexBufferOffset = 0;
