@@ -15,6 +15,16 @@
 
 namespace 
 {
+	inline static TArray<std::string> FNamesToStdStrings(const TArray<FName>& Items)
+	{
+		TArray<std::string> Results;
+		for (FName Item : Items)
+		{
+			Results.Add(std::string(TCHAR_TO_ANSI(*Item.ToString())));
+		}
+		return Results;
+	}
+
 	inline static TArray<std::string> FStringsToStdStrings(const TArray<FString>& Items)
 	{
 		TArray<std::string> Results;
@@ -606,9 +616,17 @@ void UImGuiBlueprintLibrary::EndCombo()
 	ImGui::EndCombo();
 }
 
-bool UImGuiBlueprintLibrary::ComboArray(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
+bool UImGuiBlueprintLibrary::ComboArrayString(FString label, int& current_item, TArray<FString> items, int popup_max_height_in_items)
 {
 	TArray<std::string> items_str = FStringsToStdStrings(items);
+	TArray<const char *> items_c = StdStringsToCCharPtrs(items_str);
+
+	return ImGui::Combo(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items_c.Num(), popup_max_height_in_items);
+}
+
+bool UImGuiBlueprintLibrary::ComboArrayName(FString label, int& current_item, TArray<FName> items, int popup_max_height_in_items)
+{
+	TArray<std::string> items_str = FNamesToStdStrings(items);
 	TArray<const char *> items_c = StdStringsToCCharPtrs(items_str);
 
 	return ImGui::Combo(TCHAR_TO_ANSI(*label), &current_item, items_c.GetData(), items_c.Num(), popup_max_height_in_items);

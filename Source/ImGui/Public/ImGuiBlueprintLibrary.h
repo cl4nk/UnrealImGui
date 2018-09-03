@@ -519,7 +519,8 @@ public:
 	// The old Combo() api are helpers over BeginCombo()/EndCombo() which are kept available for convenience purpose.
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static bool          BeginCombo(FString label, FString preview_value, UPARAM(meta = (Bitmask, BitmaskEnum = EImGuiSelectableFlags_)) int32 flags = 0);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static void          EndCombo(); // only call EndCombo() if BeginCombo() returns true!
-	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static bool          ComboArray(FString label, UPARAM(ref) int& current_item, TArray<FString> items, int popup_max_height_in_items = -1);
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static bool          ComboArrayString(FString label, UPARAM(ref) int& current_item, TArray<FString> items, int popup_max_height_in_items = -1);
+	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static bool          ComboArrayName(FString label, UPARAM(ref) int& current_item, TArray<FName> items, int popup_max_height_in_items = -1);
 	UFUNCTION(BlueprintCallable, meta = (Category = "ImGui|Widgets|Combo box")) static bool          Combo(FString label, UPARAM(ref) int& current_item, FString items_separated_by_zeros, int popup_max_height_in_items = -1);      // Separate items with \0 within a string, end item-list with \0\0. e.g. "One\0Two\0Three\0"
 
 	// Widgets: Drags (tip: ctrl+click on a drag box to input with keyboard. manually input values aren't clamped, can go off-bounds)
